@@ -1,0 +1,64 @@
+<view class="container">
+  <!-- 输入表单 -->
+  <view class="form-card">
+    <view class="form-title">新增记录</view>
+    <view class="form-row">
+      <input class="input-item" placeholder="日期 (如 2026-04-18)" bindinput="onInput" data-field="date" value="{{form.date}}" />
+      <input class="input-item" placeholder="车号" bindinput="onInput" data-field="truckNum" value="{{form.truckNum}}" />
+    </view>
+    <view class="form-row">
+      <input class="input-item" placeholder="规格" bindinput="onInput" data-field="spec" value="{{form.spec}}" />
+      <input class="input-item" placeholder="件数" bindinput="onInput" data-field="pieces" value="{{form.pieces}}" />
+    </view>
+    <view class="form-row">
+      <input class="input-item" placeholder="重量/吨 (数字)" bindinput="onInput" data-field="weight" value="{{form.weight}}" type="digit" />
+      <input class="input-item" placeholder="单价 (元/吨)" bindinput="onInput" data-field="price" value="{{form.price}}" type="digit" />
+    </view>
+    <view class="form-actions">
+      <button type="primary" size="default" bindtap="addRecord">添加记录</button>
+      <button type="warn" size="default" bindtap="deleteLastRecord">删除上一行</button>
+    </view>
+  </view>
+
+  <!-- 数据预览表格（带合并效果） -->
+  <view class="preview-card" wx:if="{{displayRows.length > 0}}">
+    <view class="preview-title">数据预览（支持合并）</view>
+    <scroll-view scroll-x="true" class="table-scroll">
+      <view class="preview-table">
+        <!-- 表头 -->
+        <view class="table-row header">
+          <view class="table-cell" style="min-width: 140rpx;">日期</view>
+          <view class="table-cell" style="min-width: 140rpx;">车号</view>
+          <view class="table-cell" style="min-width: 160rpx;">规格</view>
+          <view class="table-cell" style="min-width: 100rpx;">件数</view>
+          <view class="table-cell" style="min-width: 140rpx;">重量/吨</view>
+          <view class="table-cell" style="min-width: 140rpx;">单价</view>
+          <view class="table-cell" style="min-width: 160rpx;">总价</view>
+        </view>
+        <!-- 数据行（动态处理rowspan） -->
+        <block wx:for="{{displayRows}}" wx:key="index">
+          <view class="table-row">
+            <view class="table-cell" wx:if="{{item.showDate}}" style="min-width: 140rpx;" rowspan="{{item.dateRowspan}}">{{item.date}}</view>
+            <view class="table-cell" wx:if="{{item.showTruckNum}}" style="min-width: 140rpx;" rowspan="{{item.truckNumRowspan}}">{{item.truckNum}}</view>
+            <view class="table-cell" style="min-width: 160rpx;">{{item.spec}}</view>
+            <view class="table-cell" style="min-width: 100rpx;">{{item.pieces}}</view>
+            <view class="table-cell" wx:if="{{item.showWeight}}" style="min-width: 140rpx;" rowspan="{{item.weightRowspan}}">{{item.weight}}</view>
+            <view class="table-cell" wx:if="{{item.showPrice}}" style="min-width: 140rpx;" rowspan="{{item.priceRowspan}}">{{item.price}}</view>
+            <view class="table-cell" wx:if="{{item.showTotal}}" style="min-width: 160rpx;" rowspan="{{item.totalRowspan}}">{{item.total}}</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+    <button class="generate-btn" type="primary" bindtap="generateImage">生成表格图片</button>
+  </view>
+
+  <!-- 生成的图片展示区 -->
+  <view class="result-area" wx:if="{{generatedImage}}">
+    <text class="result-title">生成的Excel样式图片</text>
+    <image src="{{generatedImage}}" mode="widthFix" class="preview-image" bindtap="previewImage"></image>
+    <button class="save-btn" type="primary" bindtap="saveImage">保存到相册</button>
+  </view>
+
+  <!-- 隐藏canvas用于绘图 -->
+  <canvas type="2d" id="excelCanvas" style="width: 0; height: 0; position: fixed; left: -9999px;"></canvas>
+</view>

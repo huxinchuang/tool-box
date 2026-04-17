@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  padding: 40rpx;
+}
+
+.welcome {
+  text-align: center;
+  margin-bottom: 80rpx;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 32rpx;
+  color: #666;
+}
+
+.enter-btn {
+  width: 60%;
+  height: 100rpx;
+  line-height: 100rpx;
+  font-size: 36rpx;
+  border-radius: 60rpx;
+  background-color: #07c160;
+  color: white;
+  box-shadow: 0 8rpx 20rpx rgba(7, 193, 96, 0.3);
+}

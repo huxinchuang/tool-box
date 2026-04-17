@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="welcome">
+    <text class="title">欢迎使用</text>
+    <text class="subtitle">货车运输记账工具</text>
+  </view>
+  <button class="enter-btn" type="primary" bindtap="goToRecord">记账工具</button>
+</view>
