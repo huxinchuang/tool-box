@@ -8,23 +8,88 @@ Page({
       weight: '',
       price: ''
     },
-    rawRecords: [],
-    displayRows: [],
+    rawRecords: [],        // 原始记录（未合并）
+    displayRows: [],       // 显示用行（不合并单元格，但重复组后续行隐藏重量/单价/总价）
+    freightRow: null,
+    freightPrice: 30,
+    appendix: '',
     generatedImage: '',
     isLoading: false
   },
 
-  onInput(e) {
-    const field = e.currentTarget.dataset.field;
-    const value = e.detail.value;
-    this.setData({
-      [`form.${field}`]: value
-    });
+  onLoad() {
+    const freightPrice = wx.getStorageSync('freightPrice');
+    const appendix = wx.getStorageSync('appendix');
+    if (freightPrice) this.setData({ freightPrice: parseFloat(freightPrice) });
+    if (appendix) this.setData({ appendix });
+    this.updateDisplay();
   },
 
+  // 日期处理
+  normalizeDate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    dateStr = dateStr.trim();
+    if (dateStr === '') return '';
+    if (/^\d{8}$/.test(dateStr)) {
+      const year = dateStr.slice(0, 4);
+      const month = dateStr.slice(4, 6);
+      const day = dateStr.slice(6, 8);
+      const date = new Date(`${year}-${month}-${day}`);
+      if (isNaN(date.getTime())) return '';
+      return `${year}-${month}-${day}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return '';
+      return dateStr;
+    }
+    return '';
+  },
+
+  formatDisplayDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const [year, month, day] = parts;
+    return `${year}年${parseInt(month, 10)}月${parseInt(day, 10)}日`;
+  },
+
+  // 输入监听
+  onInput(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({ [`form.${field}`]: e.detail.value });
+  },
+
+  onFreightPriceInput(e) {
+    let price = parseFloat(e.detail.value);
+    if (isNaN(price)) price = 30;
+    this.setData({ freightPrice: price });
+    wx.setStorageSync('freightPrice', price);
+    this.updateDisplay();
+  },
+
+  onAppendixInput(e) {
+    const text = e.detail.value;
+    this.setData({ appendix: text });
+    wx.setStorageSync('appendix', text);
+  },
+
+  // 添加记录
   addRecord() {
     let { date, truckNum, spec, pieces, weight, price } = this.data.form;
     const rawRecords = this.data.rawRecords;
+
+    let normalizedDate = '';
+    if (date && date.trim() !== '') {
+      normalizedDate = this.normalizeDate(date);
+      if (!normalizedDate) {
+        wx.showToast({ title: '日期格式错误，使用 20260312 或 2026-03-12', icon: 'none' });
+        return;
+      }
+    } else if (rawRecords.length > 0) {
+      // 日期为空时，继承上一条记录的日期（注意上一条记录的日期可能也是继承来的，但已经是标准化值）
+      normalizedDate = rawRecords[rawRecords.length - 1].date;
+    }
 
     if (!truckNum && rawRecords.length > 0) {
       truckNum = rawRecords[rawRecords.length - 1].truckNum;
@@ -43,102 +108,117 @@ Page({
       wx.showToast({ title: '重量和单价必须是数字', icon: 'none' });
       return;
     }
-    const total = (weightNum * priceNum).toFixed(2);
-    const piecesValue = pieces || '';
+    const total = weightNum * priceNum;
 
     const newRecord = {
-      date: date || '',
+      date: normalizedDate,
       truckNum,
       spec,
-      pieces: piecesValue,
+      pieces: pieces || '',
       weight: weightNum,
       price: priceNum,
-      total
+      total: total
     };
-    const newRawRecords = [...rawRecords, newRecord];
-    this.setData({ rawRecords: newRawRecords }, () => {
+    this.setData({ rawRecords: [...rawRecords, newRecord] }, () => {
       this.updateDisplay();
     });
-    this.setData({
-      form: { date: '', truckNum: '', spec: '', pieces: '', weight: '', price: '' }
-    });
+    this.setData({ form: { date: '', truckNum: '', spec: '', pieces: '', weight: '', price: '' } });
   },
 
-  updateDisplay() {
-    const rawRecords = this.data.rawRecords;
-    if (rawRecords.length === 0) {
-      this.setData({ displayRows: [] });
-      return;
-    }
-
-    // 1. 找出合并块：连续且 date, truckNum, weight, price 都相同的记录
-    const blocks = []; // 每个元素 { startIndex, endIndex, mergeCount, record }
+  // 获取分组块（连续且日期、车号、重量、单价完全相同）
+  getGroupBlocks() {
+    const raw = this.data.rawRecords;
+    if (raw.length === 0) return [];
+    const blocks = [];
     let i = 0;
-    while (i < rawRecords.length) {
+    while (i < raw.length) {
       let j = i;
-      while (j + 1 < rawRecords.length &&
-             rawRecords[j+1].date === rawRecords[i].date &&
-             rawRecords[j+1].truckNum === rawRecords[i].truckNum &&
-             rawRecords[j+1].weight === rawRecords[i].weight &&
-             rawRecords[j+1].price === rawRecords[i].price) {
+      while (j + 1 < raw.length &&
+             raw[j+1].date === raw[i].date &&
+             raw[j+1].truckNum === raw[i].truckNum &&
+             raw[j+1].weight === raw[i].weight &&
+             raw[j+1].price === raw[i].price) {
         j++;
       }
       blocks.push({
-        startIndex: i,
-        endIndex: j,
+        start: i,
+        end: j,
         mergeCount: j - i + 1,
-        record: rawRecords[i]
+        record: raw[i]
       });
       i = j + 1;
     }
+    return blocks;
+  },
 
-    // 2. 根据每个块生成视觉行
+  // 运费重量：每组只计一次重量
+  calcDistinctWeightSum() {
+    const blocks = this.getGroupBlocks();
+    return blocks.reduce((sum, block) => sum + block.record.weight, 0);
+  },
+
+  // 总价合计：每组只计一次总价
+  calcTotalSum() {
+    const blocks = this.getGroupBlocks();
+    return blocks.reduce((sum, block) => sum + block.record.total, 0);
+  },
+
+  // 更新显示：不合并单元格，但重复组的后续行隐藏重量/单价/总价
+  updateDisplay() {
+    const rawRecords = this.data.rawRecords;
+    if (rawRecords.length === 0) {
+      this.setData({ displayRows: [], freightRow: null });
+      return;
+    }
+
+    const blocks = this.getGroupBlocks();
     const rows = [];
     for (let block of blocks) {
-      const { startIndex, endIndex, mergeCount, record } = block;
-      for (let sub = 0; sub < mergeCount; sub++) {
-        const originalRecord = rawRecords[startIndex + sub];
+      const blockRecords = rawRecords.slice(block.start, block.end + 1);
+      for (let sub = 0; sub < blockRecords.length; sub++) {
         const isFirst = (sub === 0);
+        const record = blockRecords[sub];
         rows.push({
-          date: isFirst ? record.date : '',
-          truckNum: isFirst ? record.truckNum : '',
-          spec: originalRecord.spec,
-          pieces: originalRecord.pieces,
+          date: this.formatDisplayDate(record.date),
+          truckNum: record.truckNum,
+          spec: record.spec,
+          pieces: record.pieces,
           weight: isFirst ? record.weight : '',
           price: isFirst ? record.price : '',
           total: isFirst ? record.total : '',
-          showDate: isFirst,
-          showTruckNum: isFirst,
           showWeight: isFirst,
           showPrice: isFirst,
-          showTotal: isFirst,
-          dateRowspan: isFirst ? mergeCount : 0,
-          truckNumRowspan: isFirst ? mergeCount : 0,
-          weightRowspan: isFirst ? mergeCount : 0,
-          priceRowspan: isFirst ? mergeCount : 0,
-          totalRowspan: isFirst ? mergeCount : 0
+          showTotal: isFirst
         });
       }
     }
-    this.setData({ displayRows: rows });
+
+    const distinctWeight = this.calcDistinctWeightSum();
+    const freightTotal = distinctWeight * this.data.freightPrice;
+    const freightRow = {
+      weight: distinctWeight.toFixed(2),
+      price: this.data.freightPrice,
+      total: freightTotal.toFixed(2)
+    };
+    this.setData({ displayRows: rows, freightRow });
   },
 
+  // 删除最后一条原始记录
   deleteLastRecord() {
-    let rawRecords = this.data.rawRecords;
-    if (rawRecords.length === 0) {
+    if (this.data.rawRecords.length === 0) {
       wx.showToast({ title: '无记录可删除', icon: 'none' });
       return;
     }
-    rawRecords.pop();
-    this.setData({ rawRecords }, () => {
+    this.setData({ rawRecords: this.data.rawRecords.slice(0, -1) }, () => {
       this.updateDisplay();
     });
   },
 
+  // 生成图片
   async generateImage() {
     if (this.data.isLoading) return;
-    const { displayRows } = this.data;
-    if (displayRows.length === 0) {
+    const { displayRows, freightRow, appendix } = this.data;
+    if (displayRows.length === 0 && !freightRow) {
       wx.showToast({ title: '没有数据可生成', icon: 'none' });
       return;
     }
@@ -166,27 +246,47 @@ Page({
       const headers = ['日期', '车号', '规格', '件数', '重量/吨', '单价', '总价'];
       const colCount = headers.length;
       let allRows = [headers];
+
       for (let row of displayRows) {
-        const rowCells = [];
-        if (row.showDate) rowCells.push(row.date); else rowCells.push(null);
-        if (row.showTruckNum) rowCells.push(row.truckNum); else rowCells.push(null);
-        rowCells.push(row.spec);
-        rowCells.push(row.pieces);
-        if (row.showWeight) rowCells.push(String(row.weight)); else rowCells.push(null);
-        if (row.showPrice) rowCells.push(String(row.price)); else rowCells.push(null);
-        if (row.showTotal) rowCells.push(String(row.total)); else rowCells.push(null);
-        allRows.push(rowCells);
+        allRows.push([
+          row.date,
+          row.truckNum,
+          row.spec,
+          row.pieces,
+          row.showWeight ? String(row.weight) : '',
+          row.showPrice ? String(row.price) : '',
+          row.showTotal ? String(row.total) : ''
+        ]);
       }
 
+      if (freightRow) {
+        allRows.push(['运费', '运费', '运费', '运费', freightRow.weight, freightRow.price, freightRow.total]);
+      }
+
+      const totalSum = this.calcTotalSum() + (freightRow ? parseFloat(freightRow.total) : 0);
+      const totalSumFixed = totalSum.toFixed(2);
+      const blocks = this.getGroupBlocks();
+      let latestDate = '';
+      const dates = blocks.map(b => b.record.date).filter(d => d);
+      if (dates.length) {
+        latestDate = this.formatDisplayDate(dates.sort().reverse()[0]);
+      }
+      const summaryText = `${latestDate || '至今'}止合计结欠货款 ${totalSumFixed} 元`;
+      allRows.push([summaryText, null, null, null, null, null, null]);
+
+      if (appendix && appendix.trim()) {
+        allRows.push([appendix, null, null, null, null, null, null]);
+      }
+
+      // 计算列宽
       const colWidths = new Array(colCount).fill(0);
       for (let i = 0; i < allRows.length; i++) {
         for (let j = 0; j < colCount; j++) {
-          const text = allRows[i][j];
-          if (text !== null && text !== undefined) {
-            const textWidth = ctx.measureText(String(text)).width;
-            const cellWidth = textWidth + paddingLR * 2;
-            if (cellWidth > colWidths[j]) colWidths[j] = cellWidth;
-          }
+          let text = allRows[i][j];
+          if (text === null || text === undefined) continue;
+          text = String(text);
+          const w = ctx.measureText(text).width + paddingLR * 2;
+          if (w > colWidths[j]) colWidths[j] = w;
         }
       }
       for (let i = 0; i < colWidths.length; i++) {
@@ -195,7 +295,7 @@ Page({
 
       const totalWidth = colWidths.reduce((a, b) => a + b, 0);
       const totalHeight = allRows.length * rowHeight;
-      if (totalWidth > 4096 || totalHeight > 4096) throw new Error('表格尺寸过大');
+      if (totalWidth > 4096 || totalHeight > 4096) throw new Error('表格过大');
       canvas.width = totalWidth;
       canvas.height = totalHeight;
 
@@ -230,19 +330,18 @@ Page({
         let startX = 0;
         if (i === 0) {
           drawCtx.fillStyle = '#F2F2F2';
-          drawCtx.fillRect(0, 0, totalWidth, rowHeight);
+          drawCtx.fillRect(0, startY, totalWidth, rowHeight);
           drawCtx.fillStyle = '#000000';
         } else {
-          drawCtx.fillStyle = '#FFFFFF';
+          const isFreight = (freightRow && i === (1 + displayRows.length));
+          drawCtx.fillStyle = isFreight ? '#FFF9E6' : '#FFFFFF';
           drawCtx.fillRect(0, startY, totalWidth, rowHeight);
           drawCtx.fillStyle = '#000000';
         }
         for (let j = 0; j < colCount; j++) {
           const text = row[j];
           if (text !== null && text !== undefined && text !== '') {
-            const textX = startX + paddingLR;
-            const textY = startY + rowHeight / 2;
-            drawCtx.fillText(String(text), textX, textY);
+            drawCtx.fillText(String(text), startX + paddingLR, startY + rowHeight / 2);
           }
           startX += colWidths[j];
         }
@@ -255,9 +354,17 @@ Page({
       drawCtx.strokeRect(0, 0, totalWidth, totalHeight);
 
       const tempFilePath = await new Promise((resolve, reject) => {
-        wx.canvasToTempFilePath({ canvas, success: res => resolve(res.tempFilePath), fail: reject });
+        wx.canvasToTempFilePath({
+          canvas,
+          success: (res) => resolve(res.tempFilePath),
+          fail: reject
+        });
       });
-      this.setData({ generatedImage: tempFilePath });
+      if (tempFilePath && typeof tempFilePath === 'string') {
+        this.setData({ generatedImage: tempFilePath });
+      } else {
+        throw new Error('生成的图片路径无效');
+      }
       wx.hideLoading();
       wx.showToast({ title: '生成成功', icon: 'success' });
     } catch (err) {

@@ -126,3 +126,52 @@
   width: 60%;
   margin: 0 auto;
 }
+
+/* 保留原有所有样式，仅修改/增加以下部分 */
+
+.config-row {
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.config-label {
+  width: 200rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.config-input {
+  flex: 1;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 16rpx 12rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.appendix-input {
+  flex: 1;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 16rpx 12rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+  min-height: 120rpx;
+  margin-bottom: 8rpx;
+}
+
+.form-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 20rpx;  /* 增加上边距，与附录区分 */
+}
+
+/* 删除原 .config-card 样式 */
+
+.freight-row {
+  background-color: #f9f9e6;
+  font-weight: bold;
+}
+

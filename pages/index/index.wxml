@@ -14,18 +14,29 @@
       <input class="input-item" placeholder="重量/吨 (数字)" bindinput="onInput" data-field="weight" value="{{form.weight}}" type="digit" />
       <input class="input-item" placeholder="单价 (元/吨)" bindinput="onInput" data-field="price" value="{{form.price}}" type="digit" />
     </view>
+
+    <!-- 运费单价和附录 -->
+    <view class="config-row">
+      <text class="config-label">运费单价(元/吨)：</text>
+      <input class="config-input" type="digit" value="{{freightPrice}}" bindinput="onFreightPriceInput" />
+    </view>
+    <view class="config-row">
+      <text class="config-label">附录：</text>
+      <textarea class="appendix-input" value="{{appendix}}" bindinput="onAppendixInput" placeholder="可输入备注信息，会自动保存" maxlength="200" auto-height />
+    </view>
+
     <view class="form-actions">
       <button type="primary" size="default" bindtap="addRecord">添加记录</button>
       <button type="warn" size="default" bindtap="deleteLastRecord">删除上一行</button>
     </view>
   </view>
 
-  <!-- 数据预览表格（带合并效果） -->
+  <!-- 数据预览表格：只有存在普通数据行时才显示 -->
   <view class="preview-card" wx:if="{{displayRows.length > 0}}">
     <view class="preview-title">数据预览（支持合并）</view>
     <scroll-view scroll-x="true" class="table-scroll">
       <view class="preview-table">
-        <!-- 表头 -->
+        <!-- 表头（去掉合计列） -->
         <view class="table-row header">
           <view class="table-cell" style="min-width: 140rpx;">日期</view>
           <view class="table-cell" style="min-width: 140rpx;">车号</view>
@@ -35,18 +46,36 @@
           <view class="table-cell" style="min-width: 140rpx;">单价</view>
           <view class="table-cell" style="min-width: 160rpx;">总价</view>
         </view>
-        <!-- 数据行（动态处理rowspan） -->
+
+        <!-- 普通数据行（带合并效果） -->
         <block wx:for="{{displayRows}}" wx:key="index">
           <view class="table-row">
-            <view class="table-cell" wx:if="{{item.showDate}}" style="min-width: 140rpx;" rowspan="{{item.dateRowspan}}">{{item.date}}</view>
-            <view class="table-cell" wx:if="{{item.showTruckNum}}" style="min-width: 140rpx;" rowspan="{{item.truckNumRowspan}}">{{item.truckNum}}</view>
+            <view class="table-cell" style="min-width: 140rpx;">{{item.date}}</view>
+            <view class="table-cell" style="min-width: 140rpx;">{{item.truckNum}}</view>
             <view class="table-cell" style="min-width: 160rpx;">{{item.spec}}</view>
             <view class="table-cell" style="min-width: 100rpx;">{{item.pieces}}</view>
-            <view class="table-cell" wx:if="{{item.showWeight}}" style="min-width: 140rpx;" rowspan="{{item.weightRowspan}}">{{item.weight}}</view>
-            <view class="table-cell" wx:if="{{item.showPrice}}" style="min-width: 140rpx;" rowspan="{{item.priceRowspan}}">{{item.price}}</view>
-            <view class="table-cell" wx:if="{{item.showTotal}}" style="min-width: 160rpx;" rowspan="{{item.totalRowspan}}">{{item.total}}</view>
+            <view class="table-cell" style="min-width: 140rpx;">
+              <text wx:if="{{item.showWeight}}">{{item.weight}}</text>
+            </view>
+            <view class="table-cell" style="min-width: 140rpx;">
+              <text wx:if="{{item.showPrice}}">{{item.price}}</text>
+            </view>
+            <view class="table-cell" style="min-width: 160rpx;">
+              <text wx:if="{{item.showTotal}}">{{item.total}}</text>
+            </view>
           </view>
         </block>
+
+        <!-- 运费行 -->
+        <view class="table-row freight-row" wx:if="{{freightRow}}">
+          <view class="table-cell">运费</view>
+          <view class="table-cell">运费</view>
+          <view class="table-cell">运费</view>
+          <view class="table-cell">运费</view>
+          <view class="table-cell">{{freightRow.weight}}</view>
+          <view class="table-cell">{{freightRow.price}}</view>
+          <view class="table-cell">{{freightRow.total}}</view>
+        </view>
       </view>
     </scroll-view>
     <button class="generate-btn" type="primary" bindtap="generateImage">生成表格图片</button>
@@ -59,6 +88,6 @@
     <button class="save-btn" type="primary" bindtap="saveImage">保存到相册</button>
   </view>
 
-  <!-- 隐藏canvas用于绘图 -->
+  <!-- 隐藏canvas -->
   <canvas type="2d" id="excelCanvas" style="width: 0; height: 0; position: fixed; left: -9999px;"></canvas>
 </view>
