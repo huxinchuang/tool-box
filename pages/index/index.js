@@ -8,8 +8,8 @@ Page({
       weight: '',
       price: ''
     },
-    rawRecords: [],        // 原始记录（未合并）
-    displayRows: [],       // 显示用行（不合并单元格，但重复组后续行隐藏重量/单价/总价）
+    rawRecords: [],
+    displayRows: [],
     freightRow: null,
     freightPrice: 30,
     appendix: '',
@@ -23,6 +23,18 @@ Page({
     if (freightPrice) this.setData({ freightPrice: parseFloat(freightPrice) });
     if (appendix) this.setData({ appendix });
     this.updateDisplay();
+  },
+
+  // ========== 舍入规则：小数部分<0.9舍去，≥0.9进位 ==========
+  roundSpecial(value) {
+    if (isNaN(value)) return 0;
+    const intPart = Math.floor(value);
+    const decimal = value - intPart;
+    if (decimal < 0.9) {
+      return intPart;
+    } else {
+      return Math.ceil(value);
+    }
   },
 
   // 日期处理
@@ -87,7 +99,6 @@ Page({
         return;
       }
     } else if (rawRecords.length > 0) {
-      // 日期为空时，继承上一条记录的日期（注意上一条记录的日期可能也是继承来的，但已经是标准化值）
       normalizedDate = rawRecords[rawRecords.length - 1].date;
     }
 
@@ -108,7 +119,9 @@ Page({
       wx.showToast({ title: '重量和单价必须是数字', icon: 'none' });
       return;
     }
-    const total = weightNum * priceNum;
+    // 计算总价并应用舍入规则
+    const rawTotal = weightNum * priceNum;
+    const total = this.roundSpecial(rawTotal);
 
     const newRecord = {
       date: normalizedDate,
@@ -157,7 +170,7 @@ Page({
     return blocks.reduce((sum, block) => sum + block.record.weight, 0);
   },
 
-  // 总价合计：每组只计一次总价
+  // 总价合计：每组只计一次总价（已经是舍入后的整数）
   calcTotalSum() {
     const blocks = this.getGroupBlocks();
     return blocks.reduce((sum, block) => sum + block.record.total, 0);
@@ -194,11 +207,12 @@ Page({
     }
 
     const distinctWeight = this.calcDistinctWeightSum();
-    const freightTotal = distinctWeight * this.data.freightPrice;
+    const rawFreightTotal = distinctWeight * this.data.freightPrice;
+    const freightTotal = this.roundSpecial(rawFreightTotal);
     const freightRow = {
       weight: distinctWeight.toFixed(2),
       price: this.data.freightPrice,
-      total: freightTotal.toFixed(2)
+      total: freightTotal
     };
     this.setData({ displayRows: rows, freightRow });
   },
@@ -260,10 +274,10 @@ Page({
       }
 
       if (freightRow) {
-        allRows.push(['运费', '运费', '运费', '运费', freightRow.weight, freightRow.price, freightRow.total]);
+        allRows.push(['运费', '运费', '运费', '运费', freightRow.weight, freightRow.price, String(freightRow.total)]);
       }
 
-      const totalSum = this.calcTotalSum() + (freightRow ? parseFloat(freightRow.total) : 0);
+      const totalSum = this.calcTotalSum() + (freightRow ? freightRow.total : 0);
       const totalSumFixed = totalSum.toFixed(2);
       const blocks = this.getGroupBlocks();
       let latestDate = '';

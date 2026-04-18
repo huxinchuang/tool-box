@@ -8,7 +8,7 @@
     </view>
     <view class="form-row">
       <input class="input-item" placeholder="规格" bindinput="onInput" data-field="spec" value="{{form.spec}}" />
-      <input class="input-item" placeholder="件数" bindinput="onInput" data-field="pieces" value="{{form.pieces}}" />
+      <input class="input-item" placeholder="件数" bindinput="onInput" data-field="pieces" value="{{form.pieces}}" type="digit"/>
     </view>
     <view class="form-row">
       <input class="input-item" placeholder="重量/吨 (数字)" bindinput="onInput" data-field="weight" value="{{form.weight}}" type="digit" />
