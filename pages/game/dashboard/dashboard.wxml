@@ -10,6 +10,12 @@
     <text class="balance-unit">个</text>
   </view>
 
+  <!-- 余额变化折线图 -->
+  <view class="chart-card">
+    <view class="chart-title">余额变化趋势</view>
+    <canvas type="2d" id="balanceChart" class="chart-canvas"></canvas>
+  </view>
+
   <!-- 功能入口 -->
   <view class="menu-card">
     <view class="menu-item" bindtap="goHistory">

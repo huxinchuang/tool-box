@@ -29,7 +29,7 @@ function createToken(userId) {
 function getUserByToken(token) {
   if (!token) return null;
   return db.prepare(
-    `SELECT u.id, u.username, u.password_hash, u.role, u.nickname, u.balance
+    `SELECT u.id, u.username, u.password_hash, u.role, u.nickname, u.balance, u.created_at
      FROM sessions s JOIN users u ON u.id = s.user_id
      WHERE s.token = ? AND s.expires_at > ?`
   ).get(token, new Date().toISOString()) || null;
@@ -42,7 +42,8 @@ function publicUser(user) {
     username: user.username,
     role: user.role,
     nickname: user.nickname,
-    balance: user.balance
+    balance: user.balance,
+    created_at: user.created_at
   };
 }
 

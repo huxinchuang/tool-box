@@ -61,6 +61,8 @@ echo "===== 5. 变动历史（管理员视角） ====="
 R=$(req GET "/api/transactions?playerId=$PID" '' "$ADMIN_TOKEN")
 check "历史条数=2" "2" "$(echo "$R" | json 'data.total')"
 check "最新一条是减30" "-30" "$(echo "$R" | json 'data.list[0].amount')"
+R=$(req GET "/api/transactions?playerId=$PID&order=asc" '' "$ADMIN_TOKEN")
+check "asc排序第一条是加100" "100" "$(echo "$R" | json 'data.list[0].amount')"
 
 echo "===== 6. 玩家视角 ====="
 R=$(req POST /api/auth/login "{\"username\":\"$UNIQ\",\"password\":\"p123456\"}")
