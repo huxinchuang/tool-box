@@ -11,9 +11,13 @@ Page({
     // 加减币面板
     showAdjust: false,
     adjustMode: 'add', // add | deduct
+    adjustType: 'fixed', // fixed=固定数量 | percent=百分比
     selectedPlayer: null,
     adjustAmount: '',
-    adjustRemark: ''
+    adjustBase: '',
+    adjustPercent: '',
+    adjustRemark: '',
+    previewText: ''
   },
 
   onShow() {
@@ -70,9 +74,13 @@ Page({
     this.setData({
       showAdjust: true,
       adjustMode: mode,
+      adjustType: 'fixed',
       selectedPlayer: player,
       adjustAmount: '',
-      adjustRemark: ''
+      adjustBase: '',
+      adjustPercent: '',
+      adjustRemark: '',
+      previewText: ''
     });
   },
 
@@ -80,26 +88,96 @@ Page({
     this.setData({ showAdjust: false, selectedPlayer: null });
   },
 
+  // 切换固定数量 / 百分比模式
+  switchAdjustType(e) {
+    this.setData({
+      adjustType: e.currentTarget.dataset.type,
+      adjustAmount: '',
+      adjustBase: '',
+      adjustPercent: '',
+      previewText: ''
+    });
+  },
+
   onAdjustInput(e) {
-    this.setData({ [e.currentTarget.dataset.field]: e.detail.value });
+    this.setData({ [e.currentTarget.dataset.field]: e.detail.value }, () => {
+      if (this.data.adjustType === 'percent') this.updatePreview();
+    });
+  },
+
+  // 百分比模式实时预览：基数 × 百分比 = 增减数量 → 新余额
+  updatePreview() {
+    const { adjustMode, selectedPlayer, adjustBase, adjustPercent } = this.data;
+    if (!selectedPlayer) return;
+    const base = parseInt(adjustBase, 10);
+    const pct = parseFloat(adjustPercent);
+    if (!base || base <= 0) { this.setData({ previewText: '' }); return; }
+    if (base > selectedPlayer.balance) {
+      this.setData({ previewText: `⚠️ 基数不能超过当前余额 ${selectedPlayer.balance}` });
+      return;
+    }
+    if (!pct || isNaN(pct)) { this.setData({ previewText: '' }); return; }
+    const sign = adjustMode === 'add' ? 1 : -1;
+    const amount = Math.round(base * pct / 100) * sign;
+    if (amount === 0) {
+      this.setData({ previewText: '⚠️ 计算结果为 0，请调整基数或百分比' });
+      return;
+    }
+    const newBalance = selectedPlayer.balance + amount;
+    const actionText = amount > 0 ? '增加' : '扣减';
+    this.setData({
+      previewText: `按 ${base} 的 ${pct}% ${actionText} ${Math.abs(amount)} 币 → 余额 ${selectedPlayer.balance} → ${newBalance}`
+    });
   },
 
   noop() {},
 
   async confirmAdjust() {
-    const { selectedPlayer, adjustMode, adjustAmount, adjustRemark } = this.data;
-    const amt = parseInt(adjustAmount, 10);
-    if (!selectedPlayer || isNaN(amt) || amt <= 0) {
-      wx.showToast({ title: '请输入正确的数量', icon: 'none' });
-      return;
-    }
-    const amount = adjustMode === 'add' ? amt : -amt;
+    const { selectedPlayer, adjustMode, adjustType, adjustAmount, adjustBase, adjustPercent, adjustRemark } = this.data;
+    if (!selectedPlayer) return;
     const actionText = adjustMode === 'add' ? '增加' : '扣减';
+
+    let payload;
+    if (adjustType === 'percent') {
+      const base = parseInt(adjustBase, 10);
+      const pct = parseFloat(adjustPercent);
+      if (!base || base <= 0) {
+        wx.showToast({ title: '请输入正确的基数', icon: 'none' });
+        return;
+      }
+      if (base > selectedPlayer.balance) {
+        wx.showToast({ title: '基数不能超过当前余额', icon: 'none' });
+        return;
+      }
+      if (!pct || isNaN(pct)) {
+        wx.showToast({ title: '请输入正确的百分比', icon: 'none' });
+        return;
+      }
+      // 正百分比=增加，负百分比=扣减
+      payload = {
+        playerId: selectedPlayer.id,
+        base,
+        percent: adjustMode === 'add' ? Math.abs(pct) : -Math.abs(pct),
+        remark: adjustRemark
+      };
+    } else {
+      const amt = parseInt(adjustAmount, 10);
+      if (isNaN(amt) || amt <= 0) {
+        wx.showToast({ title: '请输入正确的数量', icon: 'none' });
+        return;
+      }
+      payload = {
+        playerId: selectedPlayer.id,
+        amount: adjustMode === 'add' ? amt : -amt,
+        remark: adjustRemark
+      };
+    }
+
     try {
       await request({
         url: '/api/admin/adjust',
         method: 'POST',
-        data: { playerId: selectedPlayer.id, amount, remark: adjustRemark }
+        data: payload
       });
       wx.showToast({ title: `${actionText}成功`, icon: 'success' });
       this.setData({ showAdjust: false, selectedPlayer: null });

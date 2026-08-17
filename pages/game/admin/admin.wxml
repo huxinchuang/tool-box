@@ -47,9 +47,27 @@
         <text class="panel-value">{{selectedPlayer.nickname || selectedPlayer.username}}（当前 {{selectedPlayer.balance}} 个）</text>
       </view>
       <view class="panel-row">
+        <text class="panel-label">方式：</text>
+        <view class="type-switch">
+          <view class="type-chip {{adjustType === 'fixed' ? 'type-active' : ''}}" data-type="fixed" bindtap="switchAdjustType">固定数量</view>
+          <view class="type-chip {{adjustType === 'percent' ? 'type-active' : ''}}" data-type="percent" bindtap="switchAdjustType">百分比</view>
+        </view>
+      </view>
+      <view class="panel-row" wx:if="{{adjustType === 'fixed'}}">
         <text class="panel-label">数量：</text>
         <input class="panel-input" type="number" placeholder="请输入数量" value="{{adjustAmount}}" bindinput="onAdjustInput" data-field="adjustAmount" />
       </view>
+      <block wx:if="{{adjustType === 'percent'}}">
+        <view class="panel-row">
+          <text class="panel-label">基数：</text>
+          <input class="panel-input" type="number" placeholder="不超过当前余额" value="{{adjustBase}}" bindinput="onAdjustInput" data-field="adjustBase" />
+        </view>
+        <view class="panel-row">
+          <text class="panel-label">百分比：</text>
+          <input class="panel-input" type="digit" placeholder="如 5 表示 5%" value="{{adjustPercent}}" bindinput="onAdjustInput" data-field="adjustPercent" />
+        </view>
+        <view class="preview-line" wx:if="{{previewText}}">{{previewText}}</view>
+      </block>
       <view class="panel-row">
         <text class="panel-label">备注：</text>
         <input class="panel-input" placeholder="如：充值 / 消费 / 奖励（可选）" value="{{adjustRemark}}" bindinput="onAdjustInput" data-field="adjustRemark" />

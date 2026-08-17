@@ -64,6 +64,25 @@ check "最新一条是减30" "-30" "$(echo "$R" | json 'data.list[0].amount')"
 R=$(req GET "/api/transactions?playerId=$PID&order=asc" '' "$ADMIN_TOKEN")
 check "asc排序第一条是加100" "100" "$(echo "$R" | json 'data.list[0].amount')"
 
+echo "===== 5.5 百分比增减 ====="
+PCT_UNIQ="pct$UNIQ"
+R=$(req POST /api/admin/players "{\"username\":\"$PCT_UNIQ\",\"password\":\"p123456\"}" "$ADMIN_TOKEN")
+PCTPID=$(echo "$R" | json 'data.id')
+req POST /api/admin/adjust "{\"playerId\":$PCTPID,\"amount\":100}" "$ADMIN_TOKEN" >/dev/null
+R=$(req POST /api/admin/adjust "{\"playerId\":$PCTPID,\"base\":100,\"percent\":5}" "$ADMIN_TOKEN")
+check "百分比加5%(基数100×5%=5)" "5" "$(echo "$R" | json 'data.amount')"
+check "加后余额=105" "105" "$(echo "$R" | json 'data.balance')"
+check "百分比模式标记" "percent" "$(echo "$R" | json 'data.mode')"
+R=$(req POST /api/admin/adjust "{\"playerId\":$PCTPID,\"base\":100,\"percent\":-5}" "$ADMIN_TOKEN")
+check "百分比扣5%(-5)" "-5" "$(echo "$R" | json 'data.amount')"
+check "扣后余额=100" "100" "$(echo "$R" | json 'data.balance')"
+R=$(req POST /api/admin/adjust "{\"playerId\":$PCTPID,\"base\":200,\"percent\":5}" "$ADMIN_TOKEN")
+check "基数超过余额被拒绝" "基数不能超过当前余额" "$(echo "$R" | json 'message')"
+R=$(req POST /api/admin/adjust "{\"playerId\":$PCTPID,\"base\":100,\"percent\":0}" "$ADMIN_TOKEN")
+check "百分比为0被拒绝" "百分比不能为 0" "$(echo "$R" | json 'message')"
+R=$(req GET "/api/transactions?playerId=$PCTPID&order=asc" '' "$ADMIN_TOKEN")
+check "百分比流水自动备注" "按100的5%增加" "$(echo "$R" | json 'data.list[1].remark')"
+
 echo "===== 6. 玩家视角 ====="
 R=$(req POST /api/auth/login "{\"username\":\"$UNIQ\",\"password\":\"p123456\"}")
 PLAYER_TOKEN=$(echo "$R" | json 'data.token')
