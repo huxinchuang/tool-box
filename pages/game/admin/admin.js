@@ -64,7 +64,8 @@ Page({
   // ========== 加/减游戏币 ==========
   openAdjust(e) {
     const { id, mode } = e.currentTarget.dataset;
-    const player = this.data.players.find(p => p.id === id);
+    // 注意：dataset 取出的 id 是字符串，需要转成数字再和列表里的数字 id 比较
+    const player = this.data.players.find(p => p.id === parseInt(id, 10));
     if (!player) return;
     this.setData({
       showAdjust: true,
