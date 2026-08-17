@@ -1,0 +1,31 @@
+<view class="container">
+  <!-- 统计行 -->
+  <view class="summary" wx:if="{{total > 0}}">
+    <text class="summary-text">共 {{total}} 条记录</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{list.length === 0 && !loading}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无变动记录</text>
+  </view>
+
+  <!-- 流水列表 -->
+  <view class="tx-list">
+    <view class="tx-item" wx:for="{{list}}" wx:key="id">
+      <view class="tx-left">
+        <text class="tx-amount {{item.amountClass}}">{{item.amountText}}</text>
+        <text class="tx-balance">余额 {{item.balanceAfter}}</text>
+      </view>
+      <view class="tx-right">
+        <text class="tx-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
+        <text class="tx-meta">{{item.timeText}}<text wx:if="{{item.operator}}"> · {{item.operator}}</text></text>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-status">
+    <text wx:if="{{loading}}">加载中...</text>
+    <text wx:elif="{{!hasMore && list.length > 0}}">— 没有更多了 —</text>
+  </view>
+</view>

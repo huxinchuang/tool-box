@@ -2,8 +2,11 @@
   "pages": [
     "pages/home/home",
     "pages/index/index",
-    "pages/logs/logs"
-    
+    "pages/logs/logs",
+    "pages/game/login/login",
+    "pages/game/dashboard/dashboard",
+    "pages/game/history/history",
+    "pages/game/admin/admin"
   ],
   "window": {
     "navigationBarTextStyle": "black",

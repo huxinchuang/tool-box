@@ -1,0 +1,37 @@
+<view class="container">
+  <!-- 余额卡片 -->
+  <view class="balance-card">
+    <view class="user-info">
+      <text class="nickname">{{user.nickname || user.username}}</text>
+      <text class="role-tag {{isAdmin ? 'role-admin' : 'role-player'}}">{{roleText}}</text>
+    </view>
+    <text class="balance-label">游戏币余额</text>
+    <text class="balance-num">{{balance}}</text>
+    <text class="balance-unit">个</text>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="menu-card">
+    <view class="menu-item" bindtap="goHistory">
+      <text class="menu-icon">📋</text>
+      <view class="menu-info">
+        <text class="menu-name">变动历史</text>
+        <text class="menu-desc">查看游戏币的每笔增减记录</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" wx:if="{{isAdmin}}" bindtap="goAdmin">
+      <text class="menu-icon">⚙️</text>
+      <view class="menu-info">
+        <text class="menu-name">玩家管理</text>
+        <text class="menu-desc">创建玩家账号、加减游戏币</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+    <view class="back" bindtap="goHome">← 返回工具箱</view>
+  </view>
+</view>

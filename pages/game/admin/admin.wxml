@@ -1,0 +1,62 @@
+<view class="container">
+  <!-- 创建玩家账号 -->
+  <view class="card">
+    <view class="card-title">创建玩家账号</view>
+    <view class="form-row">
+      <input class="input" placeholder="账号（字母数字下划线）" value="{{createForm.username}}" bindinput="onCreateInput" data-field="username" />
+    </view>
+    <view class="form-row">
+      <input class="input" placeholder="密码（至少4位）" password value="{{createForm.password}}" bindinput="onCreateInput" data-field="password" />
+    </view>
+    <view class="form-row">
+      <input class="input" placeholder="昵称（可选）" value="{{createForm.nickname}}" bindinput="onCreateInput" data-field="nickname" />
+    </view>
+    <button class="btn-primary" type="primary" size="mini" bindtap="createPlayer">创建账号</button>
+  </view>
+
+  <!-- 玩家列表 -->
+  <view class="card">
+    <view class="card-title">玩家列表</view>
+    <view class="empty" wx:if="{{players.length === 0}}">
+      <text class="empty-text">暂无玩家，先在上方创建账号</text>
+    </view>
+    <view class="player-item" wx:for="{{players}}" wx:key="id">
+      <view class="player-info">
+        <text class="player-name">{{item.nickname || item.username}}</text>
+        <text class="player-username">{{item.username}}</text>
+        <text class="player-balance">余额：{{item.balance}} 个</text>
+      </view>
+      <view class="player-actions">
+        <button class="mini-btn" size="mini" data-id="{{item.id}}" data-name="{{item.nickname || item.username}}" bindtap="viewHistory">历史</button>
+        <button class="mini-btn mini-btn-add" size="mini" data-id="{{item.id}}" data-mode="add" bindtap="openAdjust">加币</button>
+        <button class="mini-btn mini-btn-deduct" size="mini" data-id="{{item.id}}" data-mode="deduct" bindtap="openAdjust">减币</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加减币面板（半屏弹出） -->
+  <view class="mask" wx:if="{{showAdjust}}" bindtap="closeAdjust"></view>
+  <view class="adjust-panel {{showAdjust ? 'panel-show' : ''}}">
+    <view class="panel-header">
+      <text class="panel-title">{{adjustMode === 'add' ? '增加' : '扣减'}}游戏币</text>
+      <text class="panel-close" bindtap="closeAdjust">✕</text>
+    </view>
+    <view class="panel-body">
+      <view class="panel-row">
+        <text class="panel-label">玩家：</text>
+        <text class="panel-value">{{selectedPlayer.nickname || selectedPlayer.username}}（当前 {{selectedPlayer.balance}} 个）</text>
+      </view>
+      <view class="panel-row">
+        <text class="panel-label">数量：</text>
+        <input class="panel-input" type="number" placeholder="请输入数量" value="{{adjustAmount}}" bindinput="onAdjustInput" data-field="adjustAmount" />
+      </view>
+      <view class="panel-row">
+        <text class="panel-label">备注：</text>
+        <input class="panel-input" placeholder="如：充值 / 消费 / 奖励（可选）" value="{{adjustRemark}}" bindinput="onAdjustInput" data-field="adjustRemark" />
+      </view>
+    </view>
+    <button class="panel-btn {{adjustMode === 'add' ? 'btn-add' : 'btn-deduct'}}" bindtap="confirmAdjust">
+      {{adjustMode === 'add' ? '确认增加' : '确认扣减'}}
+    </button>
+  </view>
+</view>

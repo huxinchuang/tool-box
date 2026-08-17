@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="header">
+    <text class="title">🎮 游戏币管理</text>
+    <text class="subtitle">请输入账号密码登录</text>
+  </view>
+
+  <view class="card">
+    <view class="form-item">
+      <text class="label">账号</text>
+      <input class="input" placeholder="请输入账号" value="{{username}}" bindinput="onInput" data-field="username" />
+    </view>
+    <view class="form-item">
+      <text class="label">密码</text>
+      <input class="input" placeholder="请输入密码" password value="{{password}}" bindinput="onInput" data-field="password" />
+    </view>
+    <button class="login-btn" type="primary" bindtap="login" loading="{{loading}}" disabled="{{loading}}">登 录</button>
+  </view>
+
+  <view class="back" bindtap="goBack">← 返回工具箱</view>
+</view>

@@ -1,0 +1,196 @@
+.container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.form-row {
+  margin-bottom: 20rpx;
+}
+
+.input {
+  border: 1rpx solid #ddd;
+  border-radius: 12rpx;
+  padding: 18rpx 24rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.btn-primary {
+  margin-top: 8rpx;
+}
+
+.empty {
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.player-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.player-username {
+  font-size: 22rpx;
+  color: #aaa;
+  margin-top: 4rpx;
+}
+
+.player-balance {
+  font-size: 26rpx;
+  color: #4f7cff;
+  margin-top: 8rpx;
+}
+
+.player-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.mini-btn {
+  margin: 0;
+  font-size: 24rpx;
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.mini-btn-add {
+  background-color: #e8f8ef;
+  color: #07c160;
+}
+
+.mini-btn-deduct {
+  background-color: #fdecec;
+  color: #e64340;
+}
+
+/* 加减币半屏面板 */
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.adjust-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx;
+  z-index: 11;
+  transform: translateY(110%);
+  transition: transform 0.25s ease;
+}
+
+.panel-show {
+  transform: translateY(0);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28rpx;
+}
+
+.panel-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.panel-close {
+  font-size: 36rpx;
+  color: #999;
+  padding: 8rpx;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.panel-label {
+  width: 120rpx;
+  font-size: 28rpx;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.panel-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.panel-input {
+  flex: 1;
+  border: 1rpx solid #ddd;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.panel-btn {
+  margin-top: 12rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  color: white;
+}
+
+.btn-add {
+  background-color: #07c160;
+}
+
+.btn-deduct {
+  background-color: #e64340;
+}
