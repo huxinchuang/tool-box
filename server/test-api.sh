@@ -37,7 +37,7 @@ check "me接口" "admin" "$(echo "$R" | json 'data.username')"
 
 echo "===== 3. 创建玩家 ====="
 UNIQ="p$(date +%s)"
-R=$(req POST /api/admin/players "{\"username\":\"$UNIQ\",\"password\":\"p123456\",\"nickname\":\"测试玩家\"}" "$ADMIN_TOKEN")
+R=$(req POST /api/admin/players "{\"username\":\"$UNIQ\",\"password\":\"p123456\",\"nickname\":\"TestPlayer\"}" "$ADMIN_TOKEN")
 check "创建玩家" "player" "$(echo "$R" | json 'data.role')"
 PID=$(echo "$R" | json 'data.id')
 R=$(req POST /api/admin/players "{\"username\":\"$UNIQ\",\"password\":\"p123456\"}" "$ADMIN_TOKEN")
@@ -48,9 +48,9 @@ R=$(req GET /api/admin/players '' "$ADMIN_TOKEN")
 check "玩家列表包含新玩家" "$UNIQ" "$(echo "$R" | json "data.find(u=>u.username==='$UNIQ').username")"
 
 echo "===== 4. 加/减游戏币 ====="
-R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":100,\"remark\":\"充值\"}" "$ADMIN_TOKEN")
+R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":100,\"remark\":\"recharge\"}" "$ADMIN_TOKEN")
 check "加100币" "100" "$(echo "$R" | json 'data.balance')"
-R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":-30,\"remark\":\"消费扣减\"}" "$ADMIN_TOKEN")
+R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":-30,\"remark\":\"deduct\"}" "$ADMIN_TOKEN")
 check "减30币" "70" "$(echo "$R" | json 'data.balance')"
 R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":-100}" "$ADMIN_TOKEN")
 check "超额扣减被拒绝" "余额不足，无法扣减" "$(echo "$R" | json 'message')"

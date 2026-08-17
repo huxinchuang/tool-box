@@ -8,6 +8,15 @@ const router = express.Router();
 // 以下接口全部需要管理员身份
 router.use(requireAuth, requireAdmin);
 
+// 编码防护：拒绝包含 U+FFFD（替换字符）的文本，防止乱码数据入库
+function assertCleanText(value, fieldName) {
+  if (typeof value === 'string' && value.includes('\uFFFD')) {
+    const err = new Error(`${fieldName} 包含无法识别的乱码字符，请使用 UTF-8 编码`);
+    err.status = 400;
+    throw err;
+  }
+}
+
 // GET /api/admin/players —— 玩家列表（含余额）
 router.get('/players', (req, res) => {
   const list = db.prepare(
@@ -21,6 +30,9 @@ router.get('/players', (req, res) => {
 router.post('/players', (req, res) => {
   const { username, password, nickname } = req.body || {};
   const uname = String(username || '').trim();
+  const unick = String(nickname || '').trim();
+  assertCleanText(uname, '账号');
+  assertCleanText(unick, '昵称');
   if (!uname || !password) {
     return res.status(400).json({ code: 400, message: '账号和密码不能为空' });
   }
@@ -35,7 +47,7 @@ router.post('/players', (req, res) => {
   }
   const info = db.prepare(
     'INSERT INTO users (username, password_hash, role, nickname) VALUES (?, ?, ?, ?)'
-  ).run(uname, hashPassword(String(password)), 'player', String(nickname || '').trim());
+  ).run(uname, hashPassword(String(password)), 'player', unick);
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
   res.json({ code: 0, data: publicUser(user) });
 });
@@ -46,6 +58,7 @@ router.post('/players', (req, res) => {
 router.post('/adjust', (req, res) => {
   const { playerId, amount, base, percent, remark } = req.body || {};
   const pid = parseInt(playerId, 10);
+  assertCleanText(remark, '备注');
   if (!pid) {
     return res.status(400).json({ code: 400, message: '参数错误：需要玩家ID' });
   }

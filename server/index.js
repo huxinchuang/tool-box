@@ -50,7 +50,7 @@ app.use('/api/admin', require('./routes/admin'));
 // 统一错误处理（避免异常堆栈泄露给客户端）
 app.use((err, req, res, next) => {
   console.error('[server error]', err);
-  res.status(500).json({ code: 500, message: '服务器内部错误' });
+  res.status(err.status || 500).json({ code: err.status || 500, message: err.message || '服务器内部错误' });
 });
 
 app.listen(PORT, () => {
