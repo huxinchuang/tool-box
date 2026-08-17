@@ -17,6 +17,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// 根路径：简单说明页（避免浏览器访问根路径时看到 Cannot GET 造成困惑）
+app.get('/', (req, res) => {
+  res.json({
+    name: 'tool-box API server',
+    status: 'running',
+    time: new Date().toISOString(),
+    note: '小程序访问的是 /api 接口；本页仅用于确认服务状态',
+    endpoints: {
+      health: 'GET /api/health',
+      login: 'POST /api/auth/login',
+      logout: 'POST /api/auth/logout',
+      me: 'GET /api/auth/me',
+      balance: 'GET /api/balance',
+      transactions: 'GET /api/transactions?playerId=&offset=&limit=',
+      adminPlayers: 'GET/POST /api/admin/players',
+      adminAdjust: 'POST /api/admin/adjust'
+    }
+  });
+});
+
 // 健康检查
 app.get('/api/health', (req, res) => {
   res.json({ code: 0, data: { status: 'ok', time: new Date().toISOString() } });
