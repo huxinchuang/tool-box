@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "游戏币登录"
+  "navigationBarTitleText": "游戏币登录",
+  "navigationBarBackgroundColor": "#0f141b",
+  "navigationBarTextStyle": "white"
 }

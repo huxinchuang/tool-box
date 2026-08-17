@@ -1,6 +1,7 @@
+/* 暗色金融主题：GitHub 暗色风（bg #0f141b / 面板 #161b22 / 强调 #58a6ff） */
 .container {
   min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: #0f141b;
   padding: 40rpx;
   box-sizing: border-box;
 }
@@ -14,21 +15,21 @@
   display: block;
   font-size: 48rpx;
   font-weight: bold;
-  color: #333;
+  color: #e6edf3;
   margin-bottom: 16rpx;
 }
 
 .subtitle {
   display: block;
   font-size: 28rpx;
-  color: #999;
+  color: #8b949e;
 }
 
 .card {
-  background: white;
-  border-radius: 20rpx;
+  background: #161b22;
+  border: 1rpx solid #30363d;
+  border-radius: 28rpx;
   padding: 40rpx 32rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
 .form-item {
@@ -38,16 +39,17 @@
 .label {
   display: block;
   font-size: 28rpx;
-  color: #666;
+  color: #8b949e;
   margin-bottom: 12rpx;
 }
 
 .input {
-  border: 1rpx solid #ddd;
-  border-radius: 12rpx;
+  border: 1rpx solid #30363d;
+  border-radius: 16rpx;
   padding: 20rpx 24rpx;
   font-size: 30rpx;
-  background-color: #fafafa;
+  color: #e6edf3;
+  background-color: #0d1117;
 }
 
 .login-btn {
@@ -56,11 +58,14 @@
   line-height: 88rpx;
   font-size: 32rpx;
   border-radius: 44rpx;
+  background-color: #1f6feb;
+  color: white;
+  box-shadow: 0 6rpx 20rpx rgba(31, 111, 235, 0.35);
 }
 
 .back {
   text-align: center;
   margin-top: 40rpx;
   font-size: 28rpx;
-  color: #888;
+  color: #8b949e;
 }

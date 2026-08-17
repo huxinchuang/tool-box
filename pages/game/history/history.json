@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "变动历史"
+  "navigationBarTitleText": "变动历史",
+  "navigationBarBackgroundColor": "#0f141b",
+  "navigationBarTextStyle": "white"
 }

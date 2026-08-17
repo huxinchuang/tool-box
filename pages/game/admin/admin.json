@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "玩家管理"
+  "navigationBarTitleText": "玩家管理",
+  "navigationBarBackgroundColor": "#0f141b",
+  "navigationBarTextStyle": "white"
 }

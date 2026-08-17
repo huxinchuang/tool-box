@@ -1,17 +1,20 @@
+/* 暗色金融主题：GitHub 暗色风，红涨绿跌 */
 .container {
   min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: #0f141b;
   padding: 40rpx;
   box-sizing: border-box;
 }
 
+/* 余额主卡片：深色面板 + 蓝色光晕 */
 .balance-card {
-  background: linear-gradient(135deg, #4f7cff, #6a5cff);
-  border-radius: 24rpx;
+  background: linear-gradient(135deg, #1f2430 0%, #161b22 60%);
+  border: 1rpx solid rgba(88, 166, 255, 0.35);
+  border-radius: 28rpx;
   padding: 48rpx 40rpx;
   margin-bottom: 32rpx;
-  color: white;
-  box-shadow: 0 8rpx 24rpx rgba(79, 124, 255, 0.35);
+  color: #e6edf3;
+  box-shadow: 0 8rpx 28rpx rgba(31, 111, 235, 0.18);
 }
 
 .user-info {
@@ -34,45 +37,48 @@
 }
 
 .role-admin {
-  background-color: rgba(255, 200, 60, 0.35);
-  border: 1rpx solid rgba(255, 200, 60, 0.7);
+  background-color: #1f6feb;
 }
 
 .role-player {
-  background-color: rgba(255, 255, 255, 0.25);
-  border: 1rpx solid rgba(255, 255, 255, 0.5);
+  background-color: #30363d;
+  color: #8b949e;
 }
 
 .balance-label {
   display: block;
   font-size: 26rpx;
-  opacity: 0.85;
+  color: #8b949e;
   margin-bottom: 12rpx;
 }
 
+/* 余额数字：等宽字体 + 强调蓝（参考页数字风格） */
 .balance-num {
   font-size: 88rpx;
   font-weight: bold;
+  color: #58a6ff;
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
 }
 
 .balance-unit {
   font-size: 28rpx;
   margin-left: 12rpx;
-  opacity: 0.85;
+  color: #8b949e;
 }
 
+/* 折线图卡片 */
 .chart-card {
-  background: white;
-  border-radius: 20rpx;
+  background: #161b22;
+  border: 1rpx solid #30363d;
+  border-radius: 28rpx;
   padding: 24rpx 24rpx 8rpx;
   margin-bottom: 32rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
 .chart-title {
   font-size: 30rpx;
   font-weight: bold;
-  color: #333;
+  color: #e6edf3;
   margin-bottom: 12rpx;
 }
 
@@ -81,10 +87,11 @@
   height: 380rpx;
 }
 
+/* 功能菜单 */
 .menu-card {
-  background: white;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  background: #161b22;
+  border: 1rpx solid #30363d;
+  border-radius: 28rpx;
   overflow: hidden;
 }
 
@@ -92,7 +99,7 @@
   display: flex;
   align-items: center;
   padding: 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid #30363d;
 }
 
 .menu-item:last-child {
@@ -100,7 +107,7 @@
 }
 
 .menu-item:active {
-  background-color: #f8f8f8;
+  background-color: #1c2128;
 }
 
 .menu-icon {
@@ -117,18 +124,18 @@
 .menu-name {
   font-size: 32rpx;
   font-weight: bold;
-  color: #333;
+  color: #e6edf3;
   margin-bottom: 6rpx;
 }
 
 .menu-desc {
   font-size: 24rpx;
-  color: #999;
+  color: #8b949e;
 }
 
 .menu-arrow {
   font-size: 40rpx;
-  color: #ccc;
+  color: #484f58;
 }
 
 .actions {
@@ -136,18 +143,18 @@
 }
 
 .logout-btn {
-  background: white;
-  color: #e64340;
+  background: #161b22;
+  border: 1rpx solid #f85149;
+  color: #f85149;
   border-radius: 44rpx;
   height: 88rpx;
   line-height: 88rpx;
   font-size: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
 .back {
   text-align: center;
   margin-top: 32rpx;
   font-size: 28rpx;
-  color: #888;
+  color: #8b949e;
 }

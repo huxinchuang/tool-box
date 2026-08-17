@@ -4,12 +4,14 @@
 //   points: [{ time: 'YYYY-MM-DD HH:mm:ss', balance: 数字, pct: 数字|null }]
 //   pct 为 null 时该点不画右轴标签（前值余额为 0 无法计算百分比）
 
-const UP_COLOR = '#e64340'   // 涨：红
-const DOWN_COLOR = '#07c160' // 跌：绿
-const FLAT_COLOR = '#999999' // 平
-const GRID_COLOR = '#eeeeee'
-const TEXT_COLOR = '#999999'
-const AXIS_COLOR = '#666666'
+// 暗色金融主题配色（参考冷西西指数页：GitHub 暗色风，红涨绿跌）
+const UP_COLOR = '#ef5350'   // 涨：红
+const DOWN_COLOR = '#26a69a' // 跌：青绿
+const FLAT_COLOR = '#8b949e' // 平
+const BG_COLOR = '#161b22'   // 画布背景（面板色）
+const GRID_COLOR = 'rgba(48, 54, 61, 0.6)'
+const TEXT_COLOR = '#8b949e'
+const HIGHLIGHT_COLOR = '#e6edf3'
 
 function formatAmount(v) {
   if (v === 0) return '0'
@@ -43,6 +45,10 @@ function drawBalanceChart(canvas, ctx, size, points) {
     ctx.fillText('暂无余额变化数据', w / 2, h / 2)
     return
   }
+
+  // 暗色画布背景
+  ctx.fillStyle = BG_COLOR
+  ctx.fillRect(0, 0, w, h)
 
   // ===== 坐标范围 =====
   const balances = points.map(p => p.balance)
@@ -151,7 +157,7 @@ function drawBalanceChart(canvas, ctx, size, points) {
   ctx.font = '10px PingFang SC, Microsoft YaHei, sans-serif'
 
   // 坐标轴含义提示（右上角）
-  ctx.fillStyle = AXIS_COLOR
+  ctx.fillStyle = TEXT_COLOR
   ctx.textAlign = 'right'
   ctx.font = '9px PingFang SC, Microsoft YaHei, sans-serif'
   ctx.fillText('左轴:余额  右轴:涨跌幅', w - 2, 8)

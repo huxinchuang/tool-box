@@ -1,6 +1,7 @@
+/* 暗色金融主题：红涨绿跌 */
 .container {
   min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: #0f141b;
   padding: 24rpx;
   box-sizing: border-box;
 }
@@ -11,7 +12,7 @@
 
 .summary-text {
   font-size: 26rpx;
-  color: #999;
+  color: #8b949e;
 }
 
 .empty {
@@ -28,13 +29,13 @@
 
 .empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: #8b949e;
 }
 
 .tx-list {
-  background: white;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  background: #161b22;
+  border: 1rpx solid #30363d;
+  border-radius: 28rpx;
   overflow: hidden;
 }
 
@@ -43,7 +44,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 28rpx 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid #30363d;
 }
 
 .tx-item:last-child {
@@ -58,19 +59,21 @@
 .tx-amount {
   font-size: 40rpx;
   font-weight: bold;
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
 }
 
+/* 红涨绿跌 */
 .amount-plus {
-  color: #07c160;
+  color: #ef5350;
 }
 
 .amount-minus {
-  color: #e64340;
+  color: #26a69a;
 }
 
 .tx-balance {
   font-size: 24rpx;
-  color: #999;
+  color: #8b949e;
   margin-top: 6rpx;
 }
 
@@ -83,19 +86,19 @@
 
 .tx-remark {
   font-size: 28rpx;
-  color: #333;
+  color: #e6edf3;
   margin-bottom: 6rpx;
   text-align: right;
 }
 
 .tx-meta {
   font-size: 22rpx;
-  color: #aaa;
+  color: #6e7681;
 }
 
 .load-status {
   text-align: center;
   padding: 24rpx 0;
   font-size: 24rpx;
-  color: #bbb;
+  color: #484f58;
 }
