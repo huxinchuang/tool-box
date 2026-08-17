@@ -1,0 +1,48 @@
+# tool-box 后端 Nginx 反向代理配置模板
+# 用法：备案通过、域名解析生效后：
+#   1. 把下面的 your-domain.com 替换成你的域名
+#   2. 申请 SSL 证书（腾讯云免费证书 / Let's Encrypt），放到 /etc/nginx/certs/
+#   3. 复制本文件到 /etc/nginx/sites-available/tool-box
+#   4. sudo ln -s /etc/nginx/sites-available/tool-box /etc/nginx/sites-enabled/
+#   5. sudo nginx -t && sudo systemctl reload nginx
+# 作用：外部只暴露 443(HTTPS)，后端服务监听在内网 127.0.0.1:3000，不直接暴露端口
+
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # 80 端口一律跳转 HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    # Let's Encrypt 证书验证（如果用 certbot，需要这个路径）
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name your-domain.com;
+
+    # SSL 证书路径（腾讯云免费证书下载 Nginx 版本后放到这里）
+    ssl_certificate     /etc/nginx/certs/your-domain.com.pem;
+    ssl_certificate_key /etc/nginx/certs/your-domain.com.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+
+    # 后端 API 反向代理：小程序 wx.request 只访问 /api/* 路径
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 其他路径返回提示
+    location / {
+        return 200 'tool-box API server';
+        add_header Content-Type text/plain;
+    }
+}
