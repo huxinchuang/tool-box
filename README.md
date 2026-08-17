@@ -150,6 +150,20 @@
 | POST | /admin/players | 管理员 | 创建玩家 {username, password, nickname} |
 | POST | /admin/adjust | 管理员 | 加/减币 {playerId, amount(±), remark} |
 
+## 界面截图（暗色金融风）
+
+游戏币管理工具采用 GitHub 暗色风格设计（背景 `#0f141b`、强调蓝 `#58a6ff`、红涨绿跌），截图见 `docs/screenshots/`：
+
+| 页面 | 截图 |
+|------|------|
+| 玩家余额页（含折线图） | [player-dashboard.png](docs/screenshots/player-dashboard.png) |
+| 余额变化折线图 | [balance-chart.png](docs/screenshots/balance-chart.png) |
+| 变动历史页 | [player-history.png](docs/screenshots/player-history.png) |
+| 玩家管理页 | [admin-manage.png](docs/screenshots/admin-manage.png) |
+| 加减币面板 | [admin-adjust.png](docs/screenshots/admin-adjust.png) |
+
+> 截图由微信开发者工具自动化测试（miniprogram-automator）生成，功能变更后自动更新至 `docs/screenshots/`。
+
 ## 技术要点
 
 - 基于微信小程序原生框架（基础库 ≥ 2.9.0，支持 Canvas 2D）
