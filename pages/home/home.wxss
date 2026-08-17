@@ -1,39 +1,80 @@
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #f0f2f5;
   padding: 40rpx;
+  box-sizing: border-box;
 }
 
-.welcome {
+.header {
   text-align: center;
-  margin-bottom: 80rpx;
+  margin: 60rpx 0 80rpx;
 }
 
 .title {
   display: block;
-  font-size: 48rpx;
+  font-size: 52rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .subtitle {
   display: block;
-  font-size: 32rpx;
-  color: #666;
+  font-size: 30rpx;
+  color: #999;
 }
 
-.enter-btn {
-  width: 60%;
-  height: 100rpx;
-  line-height: 100rpx;
-  font-size: 36rpx;
-  border-radius: 60rpx;
-  background-color: #07c160;
-  color: white;
-  box-shadow: 0 8rpx 20rpx rgba(7, 193, 96, 0.3);
+.tool-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 20rpx;
+  padding: 36rpx 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.tool-card:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.tool-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 24rpx;
+  background-color: #f5f8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52rpx;
+  margin-right: 28rpx;
+  flex-shrink: 0;
+}
+
+.tool-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.tool-desc {
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+.tool-arrow {
+  font-size: 44rpx;
+  color: #ccc;
+  margin-left: 16rpx;
 }

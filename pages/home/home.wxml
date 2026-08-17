@@ -1,7 +1,26 @@
 <view class="container">
-  <view class="welcome">
-    <text class="title">欢迎使用</text>
-    <text class="subtitle">货车运输记账工具</text>
+  <view class="header">
+    <text class="title">工具箱</text>
+    <text class="subtitle">选择要使用的工具</text>
   </view>
-  <button class="enter-btn" type="primary" bindtap="goToRecord">记账工具</button>
+
+  <!-- 货车运输记账工具入口 -->
+  <view class="tool-card" bindtap="goToTruck">
+    <view class="tool-icon">🚚</view>
+    <view class="tool-info">
+      <text class="tool-name">货车运输记账</text>
+      <text class="tool-desc">逐条录入运输记录，自动合并相同车次，计算运费并生成表格图片</text>
+    </view>
+    <text class="tool-arrow">›</text>
+  </view>
+
+  <!-- 游戏币管理工具入口 -->
+  <view class="tool-card" bindtap="goToGame">
+    <view class="tool-icon">🎮</view>
+    <view class="tool-info">
+      <text class="tool-name">游戏币管理</text>
+      <text class="tool-desc">账号登录查看游戏币余额与变动历史，管理员可加减币</text>
+    </view>
+    <text class="tool-arrow">›</text>
+  </view>
 </view>
