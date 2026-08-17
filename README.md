@@ -197,6 +197,25 @@ npm start          # 启动 API 服务，默认 http://127.0.0.1:3000
 2. 开发环境需在「详情 → 本地设置」勾选 **不校验合法域名**（后端地址为 `http://127.0.0.1:3000`，配置在 `utils/config.js`）
 3. 编译运行：首页 → 选择工具
 
+### 3. 部署到 Ubuntu 服务器（生产环境）
+
+后端已支持一键部署到 Linux 服务器（SQLite 数据库随代码一起迁移，零安装）：
+
+```bash
+cd deploy
+SERVER_HOST=你的服务器IP SERVER_PASS='你的密码' bash deploy.sh
+```
+
+部署内容：
+- 上传 `server/` 全部代码 + `data/game.db` 数据库到服务器 `~/tool-box-server`
+- 自动 `npm install` 并注册 **systemd 服务**（`toolbox-server`：开机自启、崩溃自动重启）
+- 服务监听 `3000` 端口（Node 22 使用 `--experimental-sqlite` 标志）
+
+部署后注意：
+- 需在云服务器安全组**放行 3000 端口**（腾讯云控制台 → 安全组 → 添加入站规则）
+- 小程序正式使用需 HTTPS + 备案域名，届时把 `utils/config.js` 的 `baseUrl` 改为线上地址
+- 数据库文件在服务器 `~/tool-box-server/data/game.db`，备份该文件即备份全部数据
+
 ---
 
 ## 注意事项
