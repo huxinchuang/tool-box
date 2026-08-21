@@ -88,11 +88,12 @@ function drawBalanceChart(canvas, ctx, size, series) {
   }
 
   // ===== 余额范围（跨所有序列） =====
+  // 左轴从 0 开始：余额不会为负，底部固定 0，只向上留余量
   let lo = Math.min(0, ...allPoints.map(p => p.balance))
   let hi = Math.max(...allPoints.map(p => p.balance))
   const pad = (hi - lo) * 0.15 || 1
   hi += pad
-  lo -= pad
+  if (lo < 0) lo -= pad // 仅当存在负余额时才向下扩展
 
   // 坐标函数
   const X = (d, i) => {
