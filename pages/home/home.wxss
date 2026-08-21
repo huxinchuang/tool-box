@@ -1,6 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start; /* 内容从顶部排列，防止被全局样式分散 */
   min-height: 100vh;
   background-color: #f0f2f5;
   padding: 40rpx;

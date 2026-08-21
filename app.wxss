@@ -1,9 +1,4 @@
-/**app.wxss**/
-.container {
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
-  box-sizing: border-box;
-} 
+/**app.wxss - 全局样式
+ * 注意：删除微信模板自带的 .container 规则（含 justify-content: space-between），
+ * 它会把页面内容分散到全屏高度（卡片被挤到屏幕底部）。各页面在自身 wxss 中定义容器样式。
+ */
