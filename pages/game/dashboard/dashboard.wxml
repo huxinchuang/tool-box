@@ -5,9 +5,24 @@
       <text class="nickname">{{user.nickname || user.username}}</text>
       <text class="role-tag {{isAdmin ? 'role-admin' : 'role-player'}}">{{roleText}}</text>
     </view>
-    <text class="balance-label">游戏币余额</text>
+    <text class="balance-label">{{scopeLabel}}游戏币余额</text>
     <text class="balance-num">{{balance}}</text>
     <text class="balance-unit">个</text>
+  </view>
+
+  <!-- 分组选择（单选/多选/全部） -->
+  <view class="group-card" wx:if="{{hasGroups}}">
+    <scroll-view scroll-x="true" class="chips-scroll" enable-flex="false">
+      <view class="chip {{selectedGroupIds.length === 0 ? 'chip-active' : ''}}" bindtap="selectAllGroups">全部</view>
+      <view class="chip {{item.active ? 'chip-active' : ''}}" wx:for="{{displayGroups}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleGroup">{{item.name}}</view>
+    </scroll-view>
+    <!-- 多选分组余额摘要 -->
+    <view class="group-summary" wx:if="{{groupSummary.length > 0}}">
+      <view class="summary-row" wx:for="{{groupSummary}}" wx:key="id">
+        <text class="summary-name">{{item.name}}</text>
+        <text class="summary-balance">{{item.balance}} 个</text>
+      </view>
+    </view>
   </view>
 
   <!-- 余额变化折线图 -->

@@ -11,14 +11,16 @@ Page({
     hasMore: true,
     loading: false,
     playerId: 0,
+    groupIds: '',
     titleText: '变动历史'
   },
 
   onLoad(options) {
     const playerId = options.playerId ? parseInt(options.playerId, 10) : 0;
+    const groupIds = options.groupIds || '';
     const titleText = options.playerLabel ? `${options.playerLabel}的变动历史` : '变动历史';
     wx.setNavigationBarTitle({ title: titleText });
-    this.setData({ playerId, titleText });
+    this.setData({ playerId, groupIds, titleText });
     this.loadMore(true);
   },
 
@@ -32,7 +34,8 @@ Page({
         data: {
           offset,
           limit: this.data.limit,
-          ...(this.data.playerId ? { playerId: this.data.playerId } : {})
+          ...(this.data.playerId ? { playerId: this.data.playerId } : {}),
+          ...(this.data.groupIds ? { groupId: this.data.groupIds } : {})
         }
       });
       const list = data.list.map(t => ({
@@ -42,6 +45,7 @@ Page({
         amountClass: t.amount > 0 ? 'amount-plus' : 'amount-minus',
         balanceAfter: t.balance_after,
         remark: t.remark,
+        groupName: t.group_name || '',
         operator: t.operator_nickname || t.operator_username || '',
         timeText: (t.created_at || '').replace('T', ' ').slice(0, 19)
       }));

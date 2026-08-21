@@ -20,14 +20,24 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS transactions (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id       INTEGER NOT NULL REFERENCES users(id),
+  group_id      INTEGER REFERENCES groups(id),              -- 所属分组（迁移后新增列，旧流水归入默认分组）
   amount        INTEGER NOT NULL,                           -- 变动数量：正数=增加，负数=减少
-  balance_after INTEGER NOT NULL,                           -- 变动后的余额快照
+  balance_after INTEGER NOT NULL,                           -- 该分组变动后的余额快照
   operator_id   INTEGER REFERENCES users(id),               -- 操作人（管理员）；管理员自身的操作记录可为空
-  remark        TEXT    NOT NULL DEFAULT '',                -- 备注（如“充值”“消费扣减”）
+  remark        TEXT    NOT NULL DEFAULT '',                -- 备注（如”充值””消费扣减”）
   created_at    TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX IF NOT EXISTS idx_tx_user     ON transactions(user_id, id DESC);
 CREATE INDEX IF NOT EXISTS idx_tx_operator ON transactions(operator_id);
+
+-- 余额分组（玩家的余额可拆分为多个分组，由管理员创建和管理）
+CREATE TABLE IF NOT EXISTS groups (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id),         -- 归属玩家
+  name       TEXT    NOT NULL,                              -- 分组名（如”游戏A””游戏B”）
+  created_at TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+);
+CREATE INDEX IF NOT EXISTS idx_groups_user ON groups(user_id);
 
 -- 登录会话（token 有效期内有效）
 CREATE TABLE IF NOT EXISTS sessions (

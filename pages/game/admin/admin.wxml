@@ -28,8 +28,39 @@
       </view>
       <view class="player-actions">
         <button class="mini-btn" size="mini" data-id="{{item.id}}" data-name="{{item.nickname || item.username}}" bindtap="viewHistory">历史</button>
+        <button class="mini-btn mini-btn-group" size="mini" data-id="{{item.id}}" bindtap="openGroupPanel">分组</button>
         <button class="mini-btn mini-btn-add" size="mini" data-id="{{item.id}}" data-mode="add" bindtap="openAdjust">加币</button>
         <button class="mini-btn mini-btn-deduct" size="mini" data-id="{{item.id}}" data-mode="deduct" bindtap="openAdjust">减币</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分组管理面板（半屏弹出） -->
+  <view class="mask" wx:if="{{showGroupPanel}}" bindtap="closeGroupPanel"></view>
+  <view class="adjust-panel {{showGroupPanel ? 'panel-show' : ''}}">
+    <view class="panel-header">
+      <text class="panel-title">分组管理：{{groupPlayer.nickname || groupPlayer.username}}</text>
+      <text class="panel-close" bindtap="closeGroupPanel">✕</text>
+    </view>
+    <view class="panel-body">
+      <!-- 创建分组 -->
+      <view class="create-group-row">
+        <input class="panel-input" placeholder="新分组名（如：游戏A）" value="{{newGroupName}}" bindinput="onNewGroupInput" />
+        <button class="create-group-btn" size="mini" bindtap="createGroup">创建</button>
+      </view>
+      <!-- 分组列表 -->
+      <view class="group-item" wx:for="{{groupList}}" wx:key="id">
+        <view class="group-info">
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-balance">余额 {{item.balance}} 个</text>
+        </view>
+        <view class="group-actions">
+          <button class="mini-btn" size="mini" data-id="{{item.id}}" bindtap="renameGroup">重命名</button>
+          <button class="mini-btn mini-btn-deduct" size="mini" data-id="{{item.id}}" bindtap="deleteGroup">删除</button>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{groupList.length === 0}}">
+        <text class="empty-text">还没有分组，先在上方创建</text>
       </view>
     </view>
   </view>
@@ -44,7 +75,17 @@
     <view class="panel-body">
       <view class="panel-row">
         <text class="panel-label">玩家：</text>
-        <text class="panel-value">{{selectedPlayer.nickname || selectedPlayer.username}}（当前 {{selectedPlayer.balance}} 个）</text>
+        <text class="panel-value">{{selectedPlayer.nickname || selectedPlayer.username}}</text>
+      </view>
+      <view class="panel-row">
+        <text class="panel-label">分组：</text>
+        <picker mode="selector" range="{{playerGroups}}" range-key="name" value="{{selectedGroupIndex}}" bindchange="onGroupChange">
+          <view class="picker-value">
+            <text wx:if="{{playerGroups.length > 0}}">{{playerGroups[selectedGroupIndex].name}}（余额 {{playerGroups[selectedGroupIndex].balance}}）</text>
+            <text wx:else>无分组</text>
+            <text class="picker-arrow">▾</text>
+          </view>
+        </picker>
       </view>
       <view class="panel-row">
         <text class="panel-label">方式：</text>
@@ -60,7 +101,7 @@
       <block wx:if="{{adjustType === 'percent'}}">
         <view class="panel-row">
           <text class="panel-label">基数：</text>
-          <input class="panel-input" type="number" placeholder="不超过当前余额" value="{{adjustBase}}" bindinput="onAdjustInput" data-field="adjustBase" />
+          <input class="panel-input" type="number" placeholder="不超过该分组余额" value="{{adjustBase}}" bindinput="onAdjustInput" data-field="adjustBase" />
         </view>
         <view class="panel-row">
           <text class="panel-label">百分比：</text>

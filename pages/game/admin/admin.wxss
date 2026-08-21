@@ -175,6 +175,76 @@
   color: #e6edf3;
 }
 
+/* 分组选择器 */
+.picker-value {
+  display: flex;
+  align-items: center;
+  background: #0d1117;
+  border: 1rpx solid #30363d;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  color: #e6edf3;
+  min-width: 300rpx;
+}
+
+.picker-arrow {
+  margin-left: 12rpx;
+  color: #8b949e;
+}
+
+/* 分组管理 */
+.create-group-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.create-group-row .panel-input {
+  flex: 1;
+}
+
+.create-group-btn {
+  background-color: #1f6feb;
+  color: white;
+  margin: 0;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #30363d;
+}
+
+.group-item:last-child {
+  border-bottom: none;
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #e6edf3;
+}
+
+.group-balance {
+  font-size: 24rpx;
+  color: #58a6ff;
+  margin-top: 6rpx;
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
+}
+
+.group-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
 /* 固定数量 / 百分比模式切换 */
 .type-switch {
   display: flex;
