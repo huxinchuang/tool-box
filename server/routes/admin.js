@@ -137,6 +137,68 @@ router.post('/players', (req, res) => {
   res.json({ code: 0, data: publicUser(user) });
 });
 
+// PUT /api/admin/players/:id  {nickname?, password?} —— 修改玩家昵称/密码
+// 至少提供一个字段；修改密码后该玩家的登录会话失效（需重新登录）
+router.put('/players/:id', (req, res) => {
+  const pid = parseInt(req.params.id, 10);
+  const { nickname, password } = req.body || {};
+  const player = db.prepare("SELECT * FROM users WHERE id = ? AND role = 'player'").get(pid);
+  if (!player) {
+    return res.status(404).json({ code: 404, message: '玩家不存在' });
+  }
+  const newNick = nickname !== undefined && nickname !== null ? String(nickname).trim() : undefined;
+  const newPass = password !== undefined && password !== null ? String(password) : undefined;
+  assertCleanText(newNick || '', '昵称');
+  if (newNick !== undefined && newNick.length > 20) {
+    return res.status(400).json({ code: 400, message: '昵称最多20个字符' });
+  }
+  if (newPass !== undefined && newPass.length < 4) {
+    return res.status(400).json({ code: 400, message: '密码至少4位' });
+  }
+  if (newNick === undefined && newPass === undefined) {
+    return res.status(400).json({ code: 400, message: '没有需要修改的内容' });
+  }
+
+  db.exec('BEGIN');
+  try {
+    if (newNick !== undefined) {
+      db.prepare('UPDATE users SET nickname = ? WHERE id = ?').run(newNick, pid);
+    }
+    if (newPass !== undefined) {
+      db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(newPass), pid);
+      // 密码已改：使该玩家现有会话失效，强制重新登录
+      db.prepare('DELETE FROM sessions WHERE user_id = ?').run(pid);
+    }
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(pid);
+  res.json({ code: 0, data: publicUser(user) });
+});
+
+// DELETE /api/admin/players/:id —— 删除玩家（级联删除其分组、流水、会话）
+router.delete('/players/:id', (req, res) => {
+  const pid = parseInt(req.params.id, 10);
+  const player = db.prepare("SELECT * FROM users WHERE id = ? AND role = 'player'").get(pid);
+  if (!player) {
+    return res.status(404).json({ code: 404, message: '玩家不存在' });
+  }
+  db.exec('BEGIN');
+  try {
+    db.prepare('DELETE FROM transactions WHERE user_id = ?').run(pid);
+    db.prepare('DELETE FROM groups WHERE user_id = ?').run(pid);
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(pid);
+    db.prepare('DELETE FROM users WHERE id = ?').run(pid);
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+  res.json({ code: 0, message: '玩家已删除' });
+});
+
 // POST /api/admin/adjust
 // 固定模式：{playerId, amount, remark}            amount 正数=增加，负数=减少
 // 百分比模式：{playerId, base, percent, remark}   按 base 的 |percent|% 计算增减数量（percent 正数=增加，负数=扣减），remark 为空时自动生成

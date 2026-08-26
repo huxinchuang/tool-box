@@ -67,6 +67,29 @@ check "分组1余额=0" "0" "$(echo "$R" | json 'data[0].balance')"
 R=$(req DELETE "/api/admin/groups/$GID3" '' "$ADMIN_TOKEN")
 check "删除空分组成功" "分组已删除" "$(echo "$R" | json 'message')"
 
+echo "===== 3.8 玩家编辑与删除 ====="
+EDIT_UNIQ="edit$UNIQ"
+R=$(req POST /api/admin/players "{\"username\":\"$EDIT_UNIQ\",\"password\":\"p123456\"}" "$ADMIN_TOKEN")
+EDITPID=$(echo "$R" | json 'data.id')
+R=$(req PUT "/api/admin/players/$EDITPID" '{"nickname":"EditedName"}' "$ADMIN_TOKEN")
+check "修改昵称" "EditedName" "$(echo "$R" | json 'data.nickname')"
+R=$(req PUT "/api/admin/players/$EDITPID" '{"password":"newpass123"}' "$ADMIN_TOKEN")
+check "修改密码成功" "0" "$(echo "$R" | json 'code')"
+R=$(req POST /api/auth/login "{\"username\":\"$EDIT_UNIQ\",\"password\":\"newpass123\"}")
+check "新密码登录成功" "$EDIT_UNIQ" "$(echo "$R" | json 'data.user.username')"
+R=$(req POST /api/auth/login "{\"username\":\"$EDIT_UNIQ\",\"password\":\"p123456\"}")
+check "旧密码登录失败(401)" "401" "$(echo "$R" | json 'code')"
+R=$(req PUT "/api/admin/players/$EDITPID" '{}' "$ADMIN_TOKEN")
+check "空修改被拒绝" "没有需要修改的内容" "$(echo "$R" | json 'message')"
+R=$(req PUT "/api/admin/players/$EDITPID" '{"password":"123"}' "$ADMIN_TOKEN")
+check "密码太短被拒绝" "密码至少4位" "$(echo "$R" | json 'message')"
+R=$(req DELETE "/api/admin/players/$EDITPID" '' "$ADMIN_TOKEN")
+check "删除玩家成功" "玩家已删除" "$(echo "$R" | json 'message')"
+R=$(req DELETE "/api/admin/players/$EDITPID" '' "$ADMIN_TOKEN")
+check "重复删除(404)" "404" "$(echo "$R" | json 'code')"
+R=$(req GET /api/admin/players '' "$ADMIN_TOKEN")
+check "列表中已无该玩家" "不存在" "$(echo "$R" | json "data.find(u=>u.username==='$EDIT_UNIQ') ? '存在' : '不存在'")"
+
 echo "===== 4. 加/减游戏币（默认分组） ====="
 R=$(req POST /api/admin/adjust "{\"playerId\":$PID,\"amount\":100,\"remark\":\"recharge\"}" "$ADMIN_TOKEN")
 check "加100币" "100" "$(echo "$R" | json 'data.balance')"

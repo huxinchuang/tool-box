@@ -74,6 +74,17 @@
   color: #e6edf3;
 }
 
+/* 玩家姓名可点击（编辑入口） */
+.player-name {
+  color: #58a6ff;
+}
+
+.edit-hint {
+  font-size: 24rpx;
+  color: #8b949e;
+  margin-left: 8rpx;
+}
+
 .player-username {
   font-size: 22rpx;
   color: #6e7681;
@@ -89,12 +100,13 @@
 
 .player-actions {
   display: flex;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
 .mini-btn {
   margin: 0;
-  font-size: 24rpx;
+  font-size: 22rpx;
+  padding: 0 14rpx;
   background-color: #21262d;
   color: #c9d1d9;
 }
@@ -107,6 +119,11 @@
 .mini-btn-deduct {
   background-color: rgba(38, 166, 154, 0.15);
   color: #26a69a;
+}
+
+.mini-btn-del {
+  background-color: rgba(239, 83, 80, 0.2);
+  color: #f85149;
 }
 
 /* 加减币半屏面板 */
@@ -306,4 +323,19 @@
 .btn-deduct {
   background-color: #26a69a;
   box-shadow: 0 6rpx 20rpx rgba(38, 166, 154, 0.3);
+}
+
+/* 编辑面板 */
+.edit-tip {
+  font-size: 22rpx;
+  color: #8b949e;
+  margin: -8rpx 0 16rpx 120rpx;
+}
+
+.btn-del-player {
+  margin-top: 16rpx;
+  background-color: #21262d;
+  color: #f85149;
+  border: 1rpx solid #f85149;
+  box-shadow: none;
 }

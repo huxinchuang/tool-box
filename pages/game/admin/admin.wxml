@@ -22,7 +22,7 @@
     </view>
     <view class="player-item" wx:for="{{players}}" wx:key="id">
       <view class="player-info">
-        <text class="player-name">{{item.nickname || item.username}}</text>
+        <text class="player-name" data-id="{{item.id}}" bindtap="openEditPanel">{{item.nickname || item.username}}<text class="edit-hint">✎</text></text>
         <text class="player-username">{{item.username}}</text>
         <text class="player-balance">余额：{{item.balance}} 个</text>
       </view>
@@ -31,6 +31,7 @@
         <button class="mini-btn mini-btn-group" size="mini" data-id="{{item.id}}" bindtap="openGroupPanel">分组</button>
         <button class="mini-btn mini-btn-add" size="mini" data-id="{{item.id}}" data-mode="add" bindtap="openAdjust">加币</button>
         <button class="mini-btn mini-btn-deduct" size="mini" data-id="{{item.id}}" data-mode="deduct" bindtap="openAdjust">减币</button>
+        <button class="mini-btn mini-btn-del" size="mini" data-id="{{item.id}}" bindtap="deletePlayer">删除</button>
       </view>
     </view>
   </view>
@@ -63,6 +64,32 @@
         <text class="empty-text">还没有分组，先在上方创建</text>
       </view>
     </view>
+  </view>
+
+  <!-- 编辑玩家面板（点击玩家姓名打开：改昵称/密码/删除） -->
+  <view class="mask" wx:if="{{showEditPanel}}" bindtap="closeEditPanel"></view>
+  <view class="adjust-panel {{showEditPanel ? 'panel-show' : ''}}">
+    <view class="panel-header">
+      <text class="panel-title">编辑玩家</text>
+      <text class="panel-close" bindtap="closeEditPanel">✕</text>
+    </view>
+    <view class="panel-body">
+      <view class="panel-row">
+        <text class="panel-label">账号：</text>
+        <text class="panel-value">{{editPlayer.username}}（登录用，不可修改）</text>
+      </view>
+      <view class="panel-row">
+        <text class="panel-label">昵称：</text>
+        <input class="panel-input edit-input" placeholder="玩家昵称" value="{{editForm.nickname}}" bindinput="onEditInput" data-field="nickname" />
+      </view>
+      <view class="panel-row">
+        <text class="panel-label">密码：</text>
+        <input class="panel-input edit-input" password placeholder="留空则不修改" value="{{editForm.password}}" bindinput="onEditInput" data-field="password" />
+      </view>
+      <view class="edit-tip">修改密码后，该玩家需重新登录</view>
+    </view>
+    <button class="panel-btn btn-add" bindtap="saveEdit">保存修改</button>
+    <button class="panel-btn btn-del-player" bindtap="deletePlayer" data-id="{{editPlayer.id}}">删除该玩家</button>
   </view>
 
   <!-- 加减币面板（半屏弹出） -->

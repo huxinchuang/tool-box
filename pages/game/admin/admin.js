@@ -13,6 +13,10 @@ Page({
     groupPlayer: null,
     groupList: [],
     newGroupName: '',
+    // 编辑玩家面板（昵称/密码/删除）
+    showEditPanel: false,
+    editPlayer: null,
+    editForm: { nickname: '', password: '' },
     // 加减币面板
     showAdjust: false,
     adjustMode: 'add', // add | deduct
@@ -315,6 +319,73 @@ Page({
       this.setData({ showAdjust: false, selectedPlayer: null });
       this.loadPlayers();
     } catch (e) {}
+  },
+
+  // ========== 编辑玩家（昵称/密码）与删除 ==========
+  // 点击玩家姓名打开编辑面板
+  openEditPanel(e) {
+    const pid = parseInt(e.currentTarget.dataset.id, 10);
+    const player = this.data.players.find(p => p.id === pid);
+    if (!player) return;
+    this.setData({
+      showEditPanel: true,
+      editPlayer: player,
+      editForm: { nickname: player.nickname || '', password: '' }
+    });
+  },
+
+  closeEditPanel() {
+    this.setData({ showEditPanel: false, editPlayer: null });
+  },
+
+  onEditInput(e) {
+    this.setData({ [`editForm.${e.currentTarget.dataset.field}`]: e.detail.value });
+  },
+
+  // 保存昵称/密码修改（密码留空则不修改）
+  async saveEdit() {
+    const { editPlayer, editForm } = this.data;
+    if (!editPlayer) return;
+    const payload = {};
+    const nick = editForm.nickname.trim();
+    if (nick !== (editPlayer.nickname || '')) payload.nickname = nick;
+    if (editForm.password) payload.password = editForm.password;
+    if (Object.keys(payload).length === 0) {
+      wx.showToast({ title: '没有需要修改的内容', icon: 'none' });
+      return;
+    }
+    try {
+      await request({
+        url: `/api/admin/players/${editPlayer.id}`,
+        method: 'PUT',
+        data: payload
+      });
+      wx.showToast({ title: '已保存', icon: 'success' });
+      this.setData({ showEditPanel: false, editPlayer: null });
+      this.loadPlayers();
+    } catch (e) {}
+  },
+
+  // 删除玩家
+  deletePlayer(e) {
+    const pid = parseInt(e.currentTarget.dataset.id, 10);
+    const player = this.data.players.find(p => p.id === pid);
+    if (!player) return;
+    const name = player.nickname || player.username;
+    wx.showModal({
+      title: '删除玩家',
+      content: `确定删除玩家「${name}」吗？\n将同时删除其全部分组、流水记录，且不可恢复！`,
+      confirmText: '删除',
+      confirmColor: '#e64340',
+      success: async res => {
+        if (!res.confirm) return;
+        try {
+          await request({ url: `/api/admin/players/${pid}`, method: 'DELETE' });
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.loadPlayers();
+        } catch (e) {}
+      }
+    });
   },
 
   // ========== 查看玩家历史 ==========

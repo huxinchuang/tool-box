@@ -30,12 +30,12 @@ export DISPLAY=dummy
 SSH="ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20"
 SCP="scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20"
 
-echo "=== 1/5 打包 server（含数据库） ==="
+echo "=== 1/5 打包 server（不含数据库：服务器数据为生产数据，保留并自动备份） ==="
 PKG="$(mktemp).tar.gz"
-tar -czf "$PKG" -C "$PROJECT_DIR/server" --exclude=node_modules --exclude='*.bak*' .
+tar -czf "$PKG" -C "$PROJECT_DIR/server" --exclude=node_modules --exclude='*.bak*' --exclude=data .
 
 echo "=== 2/5 上传到 $SERVER_USER@$SERVER_HOST:~/tool-box-server ==="
-$SSH $SERVER_USER@$SERVER_HOST "mkdir -p ~/tool-box-server" < /dev/null
+$SSH $SERVER_USER@$SERVER_HOST "mkdir -p ~/tool-box-server && [ -f ~/tool-box-server/data/game.db ] && cp ~/tool-box-server/data/game.db ~/tool-box-server/data/game.db.bak.\$(date +%s) && echo '已备份服务器数据库' || echo '服务器暂无数据库'" < /dev/null
 $SCP "$PKG" $SERVER_USER@$SERVER_HOST:~/tool-box-server/package.tar.gz < /dev/null
 
 echo "=== 3/5 解压 + 安装依赖 ==="
