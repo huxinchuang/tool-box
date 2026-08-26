@@ -3,6 +3,21 @@
 const request = require('../../../utils/request');
 
 Page({
+  // 分享：右上角菜单转发入口
+  onShareAppMessage() {
+    return {
+      title: '工具箱 - 游戏币管理',
+      path: '/pages/home/home'
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '工具箱 - 游戏币管理'
+    };
+  },
+
   data: {
     players: [],
     loading: false,

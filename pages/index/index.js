@@ -1,4 +1,19 @@
 Page({
+  // 分享：右上角菜单转发入口
+  onShareAppMessage() {
+    return {
+      title: '货车运输记账工具',
+      path: '/pages/index/index'
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '货车运输记账工具'
+    };
+  },
+
   data: {
     form: {
       date: '',
