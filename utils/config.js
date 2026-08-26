@@ -1,8 +1,8 @@
 // 后端 API 地址配置
-// 生产环境：Ubuntu 服务器（43.139.150.115，腾讯云，systemd 服务 toolbox-server）
-// 开发环境：本地后端（npm start 后访问 127.0.0.1:3000），与服务器数据相互独立
-// 微信开发者工具需勾选"不校验合法域名"；正式上线需 HTTPS + 备案域名
+// 生产环境（当前）：https://hulaquan.asia（Ubuntu 服务器 + Nginx 反代 + Let's Encrypt 证书）
+// 本地开发：127.0.0.1:3000（本地后端，与服务器数据相互独立）
+// 注意：正式版/体验版必须使用 HTTPS + 已在微信公众平台配置的 request 合法域名
 module.exports = {
-  baseUrl: 'http://43.139.150.115:3000'
+  baseUrl: 'https://hulaquan.asia'
   // baseUrl: 'http://127.0.0.1:3000'   // 本地开发用，取消注释并注释上面一行即可切换
 };
