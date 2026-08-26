@@ -53,6 +53,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ code: err.status || 500, message: err.message || '服务器内部错误' });
 });
 
-app.listen(PORT, () => {
+// 只监听本机回环地址：生产环境由 Nginx 反向代理对外提供服务，不直接暴露端口
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`tool-box API server listening on http://127.0.0.1:${PORT}`);
 });
