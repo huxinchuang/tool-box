@@ -37,6 +37,12 @@ Page({
     this.loadMe();
   },
 
+  // 下拉刷新：重新拉取最新余额（管理员=汇总）与图表
+  async onPullDownRefresh() {
+    await this.loadMe();
+    wx.stopPullDownRefresh();
+  },
+
   // 拉取最新用户信息；token 失效时 request 会自动跳登录页
   async loadMe() {
     try {

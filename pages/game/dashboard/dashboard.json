@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "游戏币管理",
   "navigationBarBackgroundColor": "#0f141b",
-  "navigationBarTextStyle": "white"
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

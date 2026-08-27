@@ -71,6 +71,7 @@ Page({
         remark: t.remark,
         groupName: t.group_name || '',
         operator: t.operator_nickname || t.operator_username || '',
+        playerName: t.player_nickname || t.player_username || '',
         timeText: (t.created_at || '').replace('T', ' ').slice(0, 19)
       }));
       this.setData({

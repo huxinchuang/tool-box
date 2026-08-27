@@ -19,7 +19,7 @@
       </view>
       <view class="tx-right">
         <text class="tx-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
-        <text class="tx-meta">{{item.timeText}}<text wx:if="{{item.groupName}}"> · {{item.groupName}}</text><text wx:if="{{item.operator}}"> · {{item.operator}}</text></text>
+        <text class="tx-meta">{{item.timeText}}<text wx:if="{{item.groupName}}"> · {{item.groupName}}</text><text wx:if="{{item.operator}}"> · {{item.operator}}</text><text wx:if="{{item.playerName}}"> · {{item.playerName}}</text></text>
       </view>
     </view>
   </view>
