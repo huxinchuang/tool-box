@@ -36,7 +36,7 @@ R=$(req GET /api/auth/me '' "$ADMIN_TOKEN")
 check "me接口" "admin" "$(echo "$R" | json 'data.username')"
 
 echo "===== 3. 创建玩家 ====="
-UNIQ="p$(date +%s)"
+UNIQ="test$(date +%s)"
 R=$(req POST /api/admin/players "{\"username\":\"$UNIQ\",\"password\":\"p123456\",\"nickname\":\"TestPlayer\"}" "$ADMIN_TOKEN")
 check "创建玩家" "player" "$(echo "$R" | json 'data.role')"
 PID=$(echo "$R" | json 'data.id')
@@ -68,7 +68,7 @@ R=$(req DELETE "/api/admin/groups/$GID3" '' "$ADMIN_TOKEN")
 check "删除空分组成功" "分组已删除" "$(echo "$R" | json 'message')"
 
 echo "===== 3.8 玩家编辑与删除 ====="
-EDIT_UNIQ="edit$UNIQ"
+EDIT_UNIQ="testedit$UNIQ"
 R=$(req POST /api/admin/players "{\"username\":\"$EDIT_UNIQ\",\"password\":\"p123456\"}" "$ADMIN_TOKEN")
 EDITPID=$(echo "$R" | json 'data.id')
 R=$(req PUT "/api/admin/players/$EDITPID" '{"nickname":"EditedName"}' "$ADMIN_TOKEN")
@@ -126,7 +126,7 @@ R=$(req GET "/api/transactions?playerId=$PID&groupId=$GID,$GID2" '' "$ADMIN_TOKE
 check "多分组筛选=3条" "3" "$(echo "$R" | json 'data.total')"
 
 echo "===== 5.5 百分比增减 ====="
-PCT_UNIQ="pct$UNIQ"
+PCT_UNIQ="testpct$UNIQ"
 R=$(req POST /api/admin/players "{\"username\":\"$PCT_UNIQ\",\"password\":\"p123456\"}" "$ADMIN_TOKEN")
 PCTPID=$(echo "$R" | json 'data.id')
 req POST /api/admin/groups "{\"playerId\":$PCTPID,\"name\":\"Default\"}" "$ADMIN_TOKEN" >/dev/null

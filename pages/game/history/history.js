@@ -33,7 +33,16 @@ Page({
   onLoad(options) {
     const playerId = options.playerId ? parseInt(options.playerId, 10) : 0;
     const groupIds = options.groupIds || '';
-    const titleText = options.playerLabel ? `${options.playerLabel}的变动历史` : '变动历史';
+    const me = wx.getStorageSync('gameUser') || {};
+    // 管理员未指定玩家/分组：查看全部玩家的变动
+    let titleText;
+    if (options.playerLabel) {
+      titleText = `${options.playerLabel}的变动历史`;
+    } else if (me.role === 'admin' && !groupIds) {
+      titleText = '全部玩家变动历史';
+    } else {
+      titleText = '变动历史';
+    }
     wx.setNavigationBarTitle({ title: titleText });
     this.setData({ playerId, groupIds, titleText });
     this.loadMore(true);

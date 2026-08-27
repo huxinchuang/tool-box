@@ -65,14 +65,20 @@ Page({
 
   // 计算当前展示范围的余额与摘要
   refreshDisplay() {
-    const { groups, selectedGroupIds } = this.data;
+    const { groups, selectedGroupIds, isAdmin, user } = this.data;
     const selected = groups.filter(g => selectedGroupIds.includes(g.id));
     let balance;
     let scopeLabel;
     let groupSummary;
     if (selectedGroupIds.length === 0) {
-      balance = groups.reduce((s, g) => s + g.balance, 0);
-      scopeLabel = '全部';
+      if (isAdmin) {
+        // 管理员：余额 = 全部业务玩家汇总（/api/me 已返回汇总值）
+        balance = user ? user.balance : 0;
+        scopeLabel = '全部玩家';
+      } else {
+        balance = groups.reduce((s, g) => s + g.balance, 0);
+        scopeLabel = '全部';
+      }
       groupSummary = [];
     } else {
       balance = selected.reduce((s, g) => s + g.balance, 0);
@@ -117,19 +123,32 @@ Page({
       const series = [];
 
       if (selectedGroupIds.length === 0) {
-        // 全部：总趋势（0 起点 + 所有流水累计）
-        const data = await request({ url: '/api/transactions', data: { order: 'asc', limit: 200 } });
+        // 全部：管理员=所有业务玩家汇总趋势；玩家=自己的总趋势
+        const data = await request({ url: '/api/transactions', data: { order: 'asc', limit: 500 } });
         const points = [];
-        if (user && user.created_at) points.push({ time: user.created_at, balance: 0, pct: null });
-        let prev = 0;
-        let total = 0;
-        for (const t of data.list) {
-          total += t.amount;
-          const pct = prev === 0 ? null : ((total - prev) / prev) * 100;
-          points.push({ time: t.created_at, balance: total, pct });
-          prev = total;
+        if (this.data.isAdmin) {
+          // 管理员：按玩家分组累计，每笔变动后取所有玩家余额总和
+          const running = {};
+          let total = 0;
+          for (const t of data.list) {
+            const k = t.player_username || '?';
+            running[k] = (running[k] || 0) + t.amount;
+            total += t.amount;
+            points.push({ time: t.created_at, balance: total, pct: null });
+          }
+          series.push({ name: '全部玩家', points });
+        } else {
+          if (user && user.created_at) points.push({ time: user.created_at, balance: 0, pct: null });
+          let prev = 0;
+          let total = 0;
+          for (const t of data.list) {
+            total += t.amount;
+            const pct = prev === 0 ? null : ((total - prev) / prev) * 100;
+            points.push({ time: t.created_at, balance: total, pct });
+            prev = total;
+          }
+          series.push({ name: '全部', points });
         }
-        series.push({ name: '全部', points });
       } else {
         // 选中分组：每个分组一条序列（分组内累计余额）
         for (const g of groups.filter(x => selectedGroupIds.includes(x.id))) {

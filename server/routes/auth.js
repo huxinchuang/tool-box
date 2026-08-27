@@ -26,8 +26,19 @@ router.post('/logout', requireAuth, (req, res) => {
 });
 
 // GET /api/auth/me —— 当前登录用户信息（含最新余额）
+// 管理员：余额显示为全部业务玩家的汇总（排除 test* 测试玩家）
 router.get('/me', requireAuth, (req, res) => {
-  res.json({ code: 0, data: publicUser(req.user) });
+  const user = publicUser(req.user);
+  if (user.role === 'admin') {
+    const { s } = db.prepare(
+      `SELECT COALESCE(SUM(balance), 0) AS s FROM users
+       WHERE role = 'player'
+         AND username NOT LIKE 'test%'
+         AND nickname NOT LIKE 'test%'`
+    ).get();
+    user.balance = s;
+  }
+  res.json({ code: 0, data: user });
 });
 
 module.exports = router;
